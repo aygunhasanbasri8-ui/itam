@@ -1,0 +1,11 @@
+# Testcontainers datasource'u @ServiceConnection ile calisma aninda enjekte eder.
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+
+logging:
+  level:
+    org.flywaydb: INFO
