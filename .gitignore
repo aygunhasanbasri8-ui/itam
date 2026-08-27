@@ -1,0 +1,31 @@
+# Java
+target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Ortam
+.env
+.env.local
+application-local.yml
+
+# Isletim sistemi
+.DS_Store
+Thumbs.db
+
+# Log
+*.log
