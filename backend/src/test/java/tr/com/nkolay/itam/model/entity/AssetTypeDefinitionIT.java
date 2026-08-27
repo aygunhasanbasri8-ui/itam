@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.transaction.annotation.Transactional;
 import tr.com.nkolay.itam.AbstractIntegrationTest;
 import tr.com.nkolay.itam.enums.AssetKind;
 import tr.com.nkolay.itam.repository.AssetTypeDefinitionRepository;
@@ -26,8 +27,17 @@ class AssetTypeDefinitionIT extends AbstractIntegrationTest {
 		assertThat(sunucu.isSystem()).isTrue();
 	}
 
+    @Test
+    @DisplayName("aktif tipler sıralı dönüyor")
+    void aktifTiplerSirali() {
+        assertThat(repository.findByActiveTrueOrderBySortOrderAsc())
+                .extracting(AssetTypeDefinition::getCode)
+                .containsSequence("SERVER", "WORKSTATION", "CLOUD");
+    }
+
 	@Test
-	@DisplayName("dinamik tip GENERIC olarak kaydedilebiliyor")
+    @Transactional
+    @DisplayName("dinamik tip GENERIC olarak kaydedilebiliyor")
 	void dinamikTipEklenebiliyor() {
 		AssetTypeDefinition agCihazi = new AssetTypeDefinition();
 		agCihazi.setCode("NETWORK_DEVICE");
@@ -41,13 +51,5 @@ class AssetTypeDefinitionIT extends AbstractIntegrationTest {
 		assertThat(kayitli.getKind()).isEqualTo(AssetKind.GENERIC);
 		assertThat(kayitli.getCreatedAt()).isNotNull();
 		assertThat(kayitli.getUpdatedAt()).isNotNull();
-	}
-
-	@Test
-	@DisplayName("aktif tipler sıralı dönüyor")
-	void aktifTiplerSirali() {
-		assertThat(repository.findByActiveTrueOrderBySortOrderAsc())
-				.extracting(AssetTypeDefinition::getCode)
-				.startsWith("SERVER", "WORKSTATION", "CLOUD");
 	}
 }

@@ -15,17 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Asset tipi tanımı. Hem çekirdek beş tipi hem de yöneticinin arayüzden
- * eklediği tipleri tutar.
- * <p>
- * system = true olan kayıtlar silinemez, kind değerleri değiştirilemez;
- * yönetici yalnızca görünen adını, ikonunu ve sıralamasını düzenleyebilir.
- * <p>
- * {@code @JdbcTypeCode(NAMED_ENUM)} PostgreSQL native enum eşlemesini sağlar;
- * columnDefinition ise ddl-auto: validate kontrolünün tip adını doğru
- * karşılaştırması için gereklidir.
- */
+
 @Getter
 @Setter
 @NoArgsConstructor
