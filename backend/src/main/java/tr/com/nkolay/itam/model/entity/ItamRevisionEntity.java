@@ -1,13 +1,11 @@
 package tr.com.nkolay.itam.model.entity;
 
+import jakarta.persistence.*;
 import org.hibernate.envers.DefaultRevisionEntity;
 import org.hibernate.envers.RevisionEntity;
 
 import tr.com.nkolay.itam.config.audit.ItamRevisionListener;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,6 +23,10 @@ import lombok.Setter;
 @Entity
 @Table(name = "revinfo")
 @RevisionEntity(ItamRevisionListener.class)
+@AttributeOverrides({
+        @AttributeOverride(name = "id", column = @Column(name = "rev", nullable = false)),
+        @AttributeOverride(name = "timestamp", column = @Column(name = "revtstmp"))
+})
 public class ItamRevisionEntity extends DefaultRevisionEntity {
 
 	@Column(name = "username", length = 80)

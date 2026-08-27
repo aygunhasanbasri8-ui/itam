@@ -18,14 +18,16 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-@Testcontainers
 public abstract class AbstractIntegrationTest {
 
-	@Container
-	@ServiceConnection
-	static final PostgreSQLContainer<?> POSTGRES =
-			new PostgreSQLContainer<>("postgres:16-alpine")
-					.withDatabaseName("itam")
-					.withUsername("itam")
-					.withPassword("itam");
+    @ServiceConnection
+    static final PostgreSQLContainer<?> POSTGRES =
+            new PostgreSQLContainer<>("postgres:16-alpine")
+                    .withDatabaseName("itam")
+                    .withUsername("itam")
+                    .withPassword("itam");
+
+    static {
+        POSTGRES.start();
+    }
 }
