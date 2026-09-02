@@ -2,19 +2,12 @@
 -- ITAM - Baslangic semasi
 -- PostgreSQL 16 / Flyway V1
 -- =============================================================
--- Not: Sequence'ler INCREMENT BY 50 ve START WITH 51 olarak
--- tanimlanmistir. Hibernate tarafinda allocationSize degeri de 50
--- olmalidir; aksi halde kimlik cakismasi olusur.
--- START WITH 51 secimi, Hibernate'in varsayilan "pooled" optimizer'i
--- ilk nextval degerini araligin ust siniri kabul ettigi icindir.
--- =============================================================
+
 
 -- ============================================================
 -- 0. ENUM TIPLERI
 -- ============================================================
--- Bu kumeler koda da gomulu oldugundan native enum olarak tanimlandi.
--- base_asset.asset_type BILEREK enum degildir: yonetici arayuzden yeni
--- tip ekleyebildiginden asset_type_def tablosuna yabanci anahtardir.
+
 
 CREATE TYPE asset_status        AS ENUM ('ACTIVE', 'RETIRED', 'MAINTENANCE');
 CREATE TYPE asset_kind          AS ENUM ('SERVER', 'WORKSTATION', 'CLOUD',
@@ -52,8 +45,6 @@ CREATE TABLE department (
     CONSTRAINT uq_department_name UNIQUE (name)
 );
 
--- is_system: silinemeyen sistem kayitlari.
--- Genel sorumlu secilmeyen varliklar FIRMA kaydina zimmetlenir.
 CREATE TABLE person (
     id             BIGINT       PRIMARY KEY,
     code           VARCHAR(40),
@@ -148,7 +139,7 @@ CREATE INDEX ix_custom_field_type ON custom_field_def (asset_type_code, sort_ord
 CREATE TABLE base_asset (
     id                       BIGINT       PRIMARY KEY,
     asset_name               VARCHAR(200) NOT NULL,
-    asset_kind               asset_kind   NOT NULL,
+    asset_kind               VARCHAR(31)   NOT NULL,
     asset_type               VARCHAR(40)  NOT NULL REFERENCES asset_type_def (code),
     responsibility_owner_id  BIGINT       NOT NULL REFERENCES person (id),
     status                   asset_status NOT NULL DEFAULT 'ACTIVE',
@@ -158,18 +149,15 @@ CREATE TABLE base_asset (
     created_at               TIMESTAMPTZ  NOT NULL DEFAULT now(),
     updated_at               TIMESTAMPTZ  NOT NULL DEFAULT now(),
     created_by               VARCHAR(80),
-    updated_by               VARCHAR(80)
+    updated_by               VARCHAR(80),
+    CONSTRAINT ck_base_asset_kind CHECK (asset_kind IN ('SERVER', 'WORKSTATION', 'CLOUD', 'APPLICATION', 'BUSINESS_SERVICE', 'GENERIC'))
+
 );
 
 CREATE INDEX ix_asset_type_status ON base_asset (asset_type, status) WHERE is_deleted = FALSE;
 CREATE INDEX ix_asset_kind        ON base_asset (asset_kind)         WHERE is_deleted = FALSE;
 CREATE INDEX ix_asset_owner       ON base_asset (responsibility_owner_id);
 CREATE INDEX ix_asset_name        ON base_asset (lower(asset_name));
-
--- NOT: custom_fields uzerinde GIN indeks OLUSTURULMADI. Ilk surumde
--- custom field bazli filtreleme kapsam disi; kullanilmayan bir GIN
--- indeksi yalnizca yazma maliyeti yaratir. Filtreleme talep edildiginde
--- tek satirlik bir migration ile eklenebilir.
 
 -- ============================================================
 -- 5. ASSET TIPI DETAY TABLOLARI (JOINED INHERITANCE)
@@ -265,8 +253,6 @@ CREATE INDEX ix_dependency_child  ON asset_dependency (child_asset_id);
 -- ============================================================
 -- 7. DENETIM IZI (Hibernate Envers)
 -- ============================================================
--- *_aud tablolari Envers tarafindan uretilecek; uretilen DDL
--- dogrulandiktan sonra V2 migration'a sabitlenecektir.
 
 CREATE TABLE revinfo (
     rev       INTEGER     PRIMARY KEY,

@@ -5,12 +5,7 @@ import java.util.regex.Pattern;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-/**
- * RFC 1123 hostname doğrulayıcı.
- * <p>
- * Kurallar: her etiket 1-63 karakter, harf/rakam/tire; tire ile başlayamaz veya
- * bitemez; tam ad en fazla 253 karakter.
- */
+
 public class HostnameValidator implements ConstraintValidator<ValidHostname, String> {
 
 	private static final int MAX_LENGTH = 253;

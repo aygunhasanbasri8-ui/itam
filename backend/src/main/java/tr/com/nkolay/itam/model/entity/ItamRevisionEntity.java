@@ -9,15 +9,7 @@ import tr.com.nkolay.itam.config.audit.ItamRevisionListener;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Envers'in standart revizyon tablosunu genişletir.
- * <p>
- * Varsayılan yapı yalnızca revizyon numarası ve zaman damgası tutar;
- * "kimin, ne zaman, hangi alanı değiştirdiği" gereksinimi için kullanıcı adı
- * ve IP adresi eklendi.
- * <p>
- * revinfo tablosu V1 migration'da tanımlıdır.
- */
+
 @Getter
 @Setter
 @Entity

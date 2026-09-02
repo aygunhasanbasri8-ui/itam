@@ -8,13 +8,7 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Zaman damgalarına ek olarak işlemi yapan kullanıcıyı da tutan üst sınıf.
- * Şu an yalnızca base_asset kullanıyor.
- * <p>
- * Değerler JpaAuditingConfig içindeki AuditorAware'den gelir; Faz 4'te
- * SecurityContext'e bağlanacaktır.
- */
+
 @Getter
 @Setter
 @MappedSuperclass

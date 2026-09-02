@@ -7,17 +7,7 @@ import java.util.function.BooleanSupplier;
 import tr.com.nkolay.itam.exception.ValidationException;
 import tr.com.nkolay.itam.model.dto.ErrorDetail;
 
-/**
- * Çok hatalı doğrulama toplayıcı.
- * <p>
- * Kullanım: her kural çalıştırılır, ihlaller biriktirilir, sonunda
- * throwIfInvalid() çağrılır. İlk hatada exception fırlatmak yerine hepsini
- * toplamak kullanıcıya tek turda tam liste verir.
- * <p>
- * <b>Bilinçli olarak Spring bean DEĞİLDİR:</b> durum tutar (hata listesi, satır
- * numarası); singleton olsaydı eşzamanlı istekler birbirinin hatalarını görürdü.
- * Her istekte create() ile yeni örnek alınır.
- */
+
 public class ValidationCollector {
 
 	private final List<ErrorDetail> errors = new ArrayList<>();

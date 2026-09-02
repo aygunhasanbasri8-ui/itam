@@ -11,9 +11,7 @@ import jakarta.validation.Payload;
 
 /**
  * IPv4 veya IPv6 biçim denetimi.
- * <p>
- * null ve boş değer geçerli sayılır; zorunluluk için {@code @NotBlank} ile
- * birlikte kullanılmalıdır.
+ * null ve boş değer geçerli sayılır
  */
 @Documented
 @Constraint(validatedBy = IpAddressValidator.class)

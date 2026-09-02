@@ -72,6 +72,7 @@ public class GlobalExceptionHandler {
 	 * Veritabanı kısıtı ihlali. Tekillik indeksleri ve check constraint'ler buraya
 	 * düşer; uygulama katmanı atlansa bile son savunma hattı devrededir.
 	 */
+
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	ProblemDetail handleIntegrity(DataIntegrityViolationException ex) {
 		log.warn("Veri bütünlüğü ihlali: {}", ex.getMostSpecificCause().getMessage());

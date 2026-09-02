@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-/** Faz 0 kabul testi: Flyway şemayı eksiksiz uyguluyor mu? */
 @DisplayName("V1 şema migration")
 class SchemaMigrationIT extends AbstractIntegrationTest {
 
@@ -28,7 +27,8 @@ class SchemaMigrationIT extends AbstractIntegrationTest {
 		assertThat(tablolar).contains(
 				"app_user", "application_asset", "asset_dependency", "asset_type_def",
 				"base_asset", "business_service_asset", "cloud_asset", "custom_field_def",
-				"department", "person", "revinfo", "server_asset", "workstation_asset");
+				"department", "person", "revinfo", "server_asset", "workstation_asset",
+                "base_asset_aud","server_asset_aud");
 	}
 
 	@Test

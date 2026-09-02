@@ -5,12 +5,7 @@ import java.util.regex.Pattern;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-/**
- * IP adresi doğrulayıcı.
- * <p>
- * {@code InetAddress.getByName()} bilinçli olarak kullanılmadı: geçersiz bir
- * metin verildiğinde DNS sorgusu tetikler ve doğrulama isteğini bloklar.
- */
+
 public class IpAddressValidator implements ConstraintValidator<ValidIpAddress, String> {
 
 	private static final Pattern IPV4 = Pattern.compile(
