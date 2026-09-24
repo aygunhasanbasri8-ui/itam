@@ -70,6 +70,14 @@ public class GlobalExceptionHandler {
 		return pd;
 	}
 
+	/** Geçersiz parametre (ör. export'ta bilinmeyen kolon kodu) — kod hatası değil, istemci hatası. */
+	@ExceptionHandler(IllegalArgumentException.class)
+	ProblemDetail handleIllegalArgument(IllegalArgumentException ex) {
+		ProblemDetail pd = base(HttpStatus.BAD_REQUEST, "invalid-request", "Geçersiz istek");
+		pd.setDetail(ex.getMessage());
+		return pd;
+	}
+
 	@ExceptionHandler(ResourceNotFoundException.class)
 	ProblemDetail handleNotFound(ResourceNotFoundException ex) {
 		ProblemDetail pd = base(HttpStatus.NOT_FOUND, "not-found", "Kayıt bulunamadı");
