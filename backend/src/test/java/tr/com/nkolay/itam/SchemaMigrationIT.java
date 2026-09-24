@@ -60,13 +60,22 @@ class SchemaMigrationIT extends AbstractIntegrationTest {
 		assertThat(sistemKaydi).isTrue();
 	}
 
+	/**
+	 * nextval() ile gerçekten çağırmak yerine pg_sequences'ten tanımlı başlangıç
+	 * değerini okuyoruz. Container tüm test sınıfları arasında paylaşılıyor;
+	 * nextval() sequence'i kalıcı olarak ilerletir (rollback bunu geri almaz),
+	 * o yüzden başka bir test person_seq'ten önce bir kayıt açarsa bu test
+	 * çalışma sırasına göre kırılırdı. pg_sequences migration'ın TANIMINI
+	 * okuyor, kimin ne zaman nextval çağırdığından etkilenmiyor.
+	 */
 	@Test
 	@DisplayName("sequence'ler seed kayıtlarıyla çakışmayacak şekilde başlıyor")
 	void sequenceBaslangicDogru() {
-		Long ilkDeger = jdbc.queryForObject("SELECT nextval('person_seq')", Long.class);
+		Long baslangicDegeri = jdbc.queryForObject(
+				"SELECT start_value FROM pg_sequences WHERE sequencename = 'person_seq'", Long.class);
 
 		// START WITH 51: Firma kaydının id = 1 değeriyle çakışmaz
-		assertThat(ilkDeger).isEqualTo(51L);
+		assertThat(baslangicDegeri).isEqualTo(51L);
 	}
 
 	@Test
