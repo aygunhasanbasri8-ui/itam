@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import tr.com.nkolay.itam.AbstractIntegrationTest;
 
 @AutoConfigureMockMvc
+@WithMockUser(username = "test-admin", roles = "ADMIN")
 @Transactional
 @DisplayName("Departman CRUD")
 class DepartmentControllerIT extends AbstractIntegrationTest {

@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -59,6 +60,14 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(ValidationException.class)
 	ProblemDetail handleBusinessValidation(ValidationException ex) {
 		return build(HttpStatus.BAD_REQUEST, "validation", "Doğrulama hatası", ex.getErrors());
+	}
+
+	/** Kullanıcı adı/şifre yanlış — AuthService fırlatır. */
+	@ExceptionHandler(BadCredentialsException.class)
+	ProblemDetail handleBadCredentials(BadCredentialsException ex) {
+		ProblemDetail pd = base(HttpStatus.UNAUTHORIZED, "unauthorized", "Kimlik doğrulama başarısız");
+		pd.setDetail("Kullanıcı adı veya şifre hatalı.");
+		return pd;
 	}
 
 	@ExceptionHandler(ResourceNotFoundException.class)
