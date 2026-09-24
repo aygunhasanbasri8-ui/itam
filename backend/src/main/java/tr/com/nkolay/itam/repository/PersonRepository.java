@@ -3,10 +3,11 @@ package tr.com.nkolay.itam.repository;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import tr.com.nkolay.itam.model.entity.Person;
 
-public interface PersonRepository extends JpaRepository<Person, Long> {
+public interface PersonRepository extends JpaRepository<Person, Long>, JpaSpecificationExecutor<Person> {
 
     Optional<Person> findByCode(String code);
 
