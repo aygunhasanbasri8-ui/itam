@@ -43,6 +43,13 @@ spring:
     basename: messages
     encoding: UTF-8
 
+itam:
+  jwt:
+    # Uretimde JWT_SECRET ortam degiskeniyle degistirilmeli. HS256 en az 32
+    # byte anahtar ister; asagidaki varsayilan yalnizca gelistirme icindir.
+    secret: ${JWT_SECRET:gelistirme-ortami-icin-en-az-32-byte-uzunlugunda-varsayilan-anahtar}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:480}
+
 management:
   endpoints:
     web:
