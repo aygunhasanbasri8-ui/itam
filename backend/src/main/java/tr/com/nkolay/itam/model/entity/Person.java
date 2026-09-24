@@ -36,6 +36,10 @@ public class Person extends TimestampedEntity {
     @Column(name = "phone", length = 30)
     private String phone;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
+
     @Column(name = "is_system", nullable = false)
     private boolean system;
 
