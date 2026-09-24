@@ -1,12 +1,17 @@
 package tr.com.nkolay.itam.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +26,7 @@ import tr.com.nkolay.itam.model.dto.ApplicationAssetRequest;
 import tr.com.nkolay.itam.model.dto.ApplicationAssetResponse;
 import tr.com.nkolay.itam.model.dto.PageResponse;
 import tr.com.nkolay.itam.service.asset.ApplicationAssetService;
+import tr.com.nkolay.itam.service.export.ApplicationExportService;
 
 import jakarta.validation.Valid;
 
@@ -28,10 +34,16 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/v1/applications")
 public class ApplicationAssetController {
 
-    private final ApplicationAssetService applicationAssetService;
+    private static final MediaType XLSX_MEDIA_TYPE =
+            MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
-    public ApplicationAssetController(ApplicationAssetService applicationAssetService) {
+    private final ApplicationAssetService applicationAssetService;
+    private final ApplicationExportService applicationExportService;
+
+    public ApplicationAssetController(ApplicationAssetService applicationAssetService,
+            ApplicationExportService applicationExportService) {
         this.applicationAssetService = applicationAssetService;
+        this.applicationExportService = applicationExportService;
     }
 
     @GetMapping
@@ -59,5 +71,21 @@ public class ApplicationAssetController {
     public ApplicationAssetResponse update(@PathVariable Long id,
             @Valid @RequestBody ApplicationAssetRequest request) {
         return applicationAssetService.update(id, request);
+    }
+
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> export(
+            @RequestParam(required = false) String vendor,
+            @RequestParam(required = false) AssetStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expiryBefore,
+            @RequestParam(required = false) List<String> columns,
+            Authentication authentication) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        applicationExportService.writeXlsx(out, vendor, status, expiryBefore, columns, authentication.getName());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=uygulama-yazilim.xlsx")
+                .contentType(XLSX_MEDIA_TYPE)
+                .body(out.toByteArray());
     }
 }
