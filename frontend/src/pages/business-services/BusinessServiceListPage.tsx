@@ -1,0 +1,115 @@
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
+import { listBusinessServices } from '../../api/businessServices'
+
+const CRITICALITY_LABELS: Record<string, string> = {
+  HIGH: 'Yüksek',
+  MID: 'Orta',
+  LOW: 'Düşük',
+}
+
+export function BusinessServiceListPage() {
+  const [criticality, setCriticality] = useState('')
+  const [page, setPage] = useState(0)
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['business-services', { criticality, page }],
+    queryFn: () => listBusinessServices({ criticality: criticality || undefined, page, size: 20 }),
+  })
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-slate-800">İş Servisleri</h1>
+        <Link to="/business-services/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
+          Yeni İş Servisi
+        </Link>
+      </div>
+
+      <select
+        className="input max-w-xs"
+        value={criticality}
+        onChange={(e) => {
+          setPage(0)
+          setCriticality(e.target.value)
+        }}
+      >
+        <option value="">Tüm kritiklik seviyeleri</option>
+        <option value="HIGH">Yüksek</option>
+        <option value="MID">Orta</option>
+        <option value="LOW">Düşük</option>
+      </select>
+
+      {isLoading && <p className="text-slate-500">Yükleniyor...</p>}
+      {isError && <p className="text-red-600">Kayıtlar alınamadı.</p>}
+
+      {data && (
+        <>
+          <table className="w-full overflow-hidden rounded-lg border border-slate-200 bg-white text-sm">
+            <thead className="bg-slate-100 text-left text-slate-600">
+              <tr>
+                <th className="px-4 py-2">Asset Adı</th>
+                <th className="px-4 py-2">Kritiklik</th>
+                <th className="px-4 py-2">SLA</th>
+                <th className="px-4 py-2">Servis Sahibi</th>
+                <th className="px-4 py-2">Sorumlu</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.content.map((service) => (
+                <tr key={service.id} className="border-t border-slate-100 hover:bg-slate-50">
+                  <td className="px-4 py-2">
+                    <Link
+                      to={`/business-services/${service.id}`}
+                      className="font-medium text-slate-800 hover:underline"
+                    >
+                      {service.assetName}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-2 text-slate-600">
+                    {CRITICALITY_LABELS[service.criticality] ?? service.criticality}
+                  </td>
+                  <td className="px-4 py-2 text-slate-600">{service.sla ?? '-'}</td>
+                  <td className="px-4 py-2 text-slate-600">{service.serviceOwner?.fullName ?? '-'}</td>
+                  <td className="px-4 py-2 text-slate-600">{service.responsibilityOwner?.fullName ?? '-'}</td>
+                </tr>
+              ))}
+              {data.content.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-4 py-6 text-center text-slate-400">
+                    Kayıt bulunamadı.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+
+          <div className="flex items-center justify-between text-sm text-slate-500">
+            <span>
+              Sayfa {data.page + 1} / {Math.max(data.totalPages, 1)} — Toplam {data.totalElements} kayıt
+            </span>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                disabled={page === 0}
+                onClick={() => setPage((p) => p - 1)}
+                className="rounded border border-slate-300 px-3 py-1 disabled:opacity-40"
+              >
+                Önceki
+              </button>
+              <button
+                type="button"
+                disabled={data.last}
+                onClick={() => setPage((p) => p + 1)}
+                className="rounded border border-slate-300 px-3 py-1 disabled:opacity-40"
+              >
+                Sonraki
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
