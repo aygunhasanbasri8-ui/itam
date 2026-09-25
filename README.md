@@ -2,7 +2,7 @@
 
 Kurum bünyesindeki tüm donanım, yazılım ve iş servisi varlıklarının tek merkezden yönetildiği, denetim standartlarına uygun envanter yönetim sistemi.
 
-**Durum:** Faz 0 — iskelet ve veritabanı bağlantısı
+**Durum:** Backend Faz 0-6 tamamlandı (CRUD, kimlik doğrulama, bağımlılık haritası, denetim izi, custom field, dashboard). Frontend Faz 2'de: iskelet + kimlik doğrulama + sunucu CRUD ekranı hazır, kalan 4 asset tipi ve özel ekranlar (bağımlılık haritası, denetim izi, custom field) sırada.
 
 ---
 
@@ -15,7 +15,7 @@ Kurum bünyesindeki tüm donanım, yazılım ve iş servisi varlıklarının tek
 | Şema yönetimi | Flyway |
 | Denetim izi | Hibernate Envers |
 | API dokümantasyonu | springdoc-openapi (Swagger UI) |
-| Frontend | React 19 + TypeScript (Faz 2) |
+| Frontend | React 19 + TypeScript + Vite, TanStack Query, Tailwind CSS |
 
 ---
 
@@ -78,6 +78,18 @@ Integration test'ler Testcontainers ile kendi PostgreSQL konteynerini ayağa kal
 
 `*IT.java` ile biten sınıflar failsafe tarafından `verify` aşamasında, `*Test.java` ile bitenler surefire tarafından `test` aşamasında çalışır.
 
+### 4. Frontend'i çalıştır
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+`http://localhost:5173` — giriş: `admin` / `admin123`. Dev sunucusu `/api` isteklerini
+otomatik olarak backend'e (8080) proxy'ler, ayrıca CORS ayarı gerekmez. Ayrıntılar için
+`frontend/README.md`.
+
 ---
 
 ## Proje Yapısı
@@ -85,7 +97,7 @@ Integration test'ler Testcontainers ile kendi PostgreSQL konteynerini ayağa kal
 ```
 itam/
 ├── backend/          Spring Boot uygulaması
-├── frontend/         React uygulaması (Faz 2)
+├── frontend/         React uygulaması
 ├── docker/           docker-compose.yml
 └── docs/             Tasarım raporu ve yol haritası
 ```
@@ -172,9 +184,8 @@ Tüm sequence'ler `INCREMENT BY 50` ile tanımlıdır. Entity tarafında `alloca
 
 ### Branch ve commit
 
-- `main` — korumalı, yalnızca PR ile
-- `develop` — entegrasyon dalı
-- `feature/<konu>` — her iş için ayrı dal
+- `main` — sağlam durumu temsil eder (derleme + testler yeşil)
+- `feature/<konu>` — her iş için ayrı dal, yeşilse `main`'e `--no-ff` merge edilir
 
 Commit mesajı: tek satır, Türkçe, emir kipi.
 
