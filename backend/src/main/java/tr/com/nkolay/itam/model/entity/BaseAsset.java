@@ -1,5 +1,8 @@
 package tr.com.nkolay.itam.model.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.RelationTargetAuditMode;
@@ -66,4 +69,9 @@ public abstract class BaseAsset extends AuditableEntity {
     ///hizmet dışı ama envanterde
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted;
+
+    /** field_key -> değer; hangi anahtarların geçerli olduğu custom_field_def'ten gelir. */
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "custom_fields", nullable = false, columnDefinition = "jsonb")
+    private Map<String, String> customFields = new HashMap<>();
 }

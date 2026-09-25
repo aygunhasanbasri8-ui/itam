@@ -1,5 +1,7 @@
 package tr.com.nkolay.itam.service.asset.impl;
 
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,6 +23,7 @@ import tr.com.nkolay.itam.repository.CloudAssetRepository;
 import tr.com.nkolay.itam.repository.PersonRepository;
 import tr.com.nkolay.itam.repository.spec.CloudAssetSpecifications;
 import tr.com.nkolay.itam.service.asset.CloudAssetService;
+import tr.com.nkolay.itam.service.customfield.CustomFieldValidator;
 import tr.com.nkolay.itam.validation.ValidationCollector;
 
 @Service
@@ -33,15 +36,18 @@ public class CloudAssetServiceImpl implements CloudAssetService {
     private final PersonRepository personRepository;
     private final AssetTypeDefinitionRepository assetTypeDefinitionRepository;
     private final CloudAssetMapper mapper;
+    private final CustomFieldValidator customFieldValidator;
 
     public CloudAssetServiceImpl(CloudAssetRepository cloudAssetRepository,
             PersonRepository personRepository,
             AssetTypeDefinitionRepository assetTypeDefinitionRepository,
-            CloudAssetMapper mapper) {
+            CloudAssetMapper mapper,
+            CustomFieldValidator customFieldValidator) {
         this.cloudAssetRepository = cloudAssetRepository;
         this.personRepository = personRepository;
         this.assetTypeDefinitionRepository = assetTypeDefinitionRepository;
         this.mapper = mapper;
+        this.customFieldValidator = customFieldValidator;
     }
 
     @Override
@@ -88,6 +94,7 @@ public class CloudAssetServiceImpl implements CloudAssetService {
     private void applyRequest(CloudAsset cloud, CloudAssetRequest request) {
         ValidationCollector errors = ValidationCollector.create();
         Person owner = resolveResponsibilityOwner(request.responsibilityOwnerId(), errors);
+        customFieldValidator.validate(CLOUD_TYPE_CODE, request.customFields(), errors);
         errors.throwIfInvalid();
 
         cloud.setAssetName(request.assetName());
@@ -97,6 +104,7 @@ public class CloudAssetServiceImpl implements CloudAssetService {
         cloud.setInstanceType(request.instanceType());
         cloud.setRegion(request.region());
         cloud.setAccountId(request.accountId());
+        cloud.setCustomFields(request.customFields() == null ? Map.of() : request.customFields());
     }
 
     private Person resolveResponsibilityOwner(Long id, ValidationCollector errors) {

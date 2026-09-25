@@ -1,6 +1,7 @@
 package tr.com.nkolay.itam.model.dto;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -31,5 +32,7 @@ public record ApplicationAssetRequest(
         LocalDate expiryDate,
 
         @Size(max = 400, message = "{itam.validation.uzunluk}")
-        String installPath) {
+        String installPath,
+
+        Map<String, String> customFields) {
 }

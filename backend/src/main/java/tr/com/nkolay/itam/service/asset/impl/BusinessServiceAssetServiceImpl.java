@@ -1,5 +1,7 @@
 package tr.com.nkolay.itam.service.asset.impl;
 
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,6 +23,7 @@ import tr.com.nkolay.itam.repository.BusinessServiceAssetRepository;
 import tr.com.nkolay.itam.repository.PersonRepository;
 import tr.com.nkolay.itam.repository.spec.BusinessServiceAssetSpecifications;
 import tr.com.nkolay.itam.service.asset.BusinessServiceAssetService;
+import tr.com.nkolay.itam.service.customfield.CustomFieldValidator;
 import tr.com.nkolay.itam.validation.ValidationCollector;
 
 @Service
@@ -33,15 +36,18 @@ public class BusinessServiceAssetServiceImpl implements BusinessServiceAssetServ
     private final PersonRepository personRepository;
     private final AssetTypeDefinitionRepository assetTypeDefinitionRepository;
     private final BusinessServiceAssetMapper mapper;
+    private final CustomFieldValidator customFieldValidator;
 
     public BusinessServiceAssetServiceImpl(BusinessServiceAssetRepository businessServiceAssetRepository,
             PersonRepository personRepository,
             AssetTypeDefinitionRepository assetTypeDefinitionRepository,
-            BusinessServiceAssetMapper mapper) {
+            BusinessServiceAssetMapper mapper,
+            CustomFieldValidator customFieldValidator) {
         this.businessServiceAssetRepository = businessServiceAssetRepository;
         this.personRepository = personRepository;
         this.assetTypeDefinitionRepository = assetTypeDefinitionRepository;
         this.mapper = mapper;
+        this.customFieldValidator = customFieldValidator;
     }
 
     @Override
@@ -88,6 +94,7 @@ public class BusinessServiceAssetServiceImpl implements BusinessServiceAssetServ
         ValidationCollector errors = ValidationCollector.create();
         Person owner = resolveResponsibilityOwner(request.responsibilityOwnerId(), errors);
         Person serviceOwner = resolvePerson(request.serviceOwnerId(), "serviceOwnerId", errors);
+        customFieldValidator.validate(BUSINESS_SERVICE_TYPE_CODE, request.customFields(), errors);
         errors.throwIfInvalid();
 
         service.setAssetName(request.assetName());
@@ -96,6 +103,7 @@ public class BusinessServiceAssetServiceImpl implements BusinessServiceAssetServ
         service.setCriticality(request.criticality() == null ? ServiceCriticality.MID : request.criticality());
         service.setSla(request.sla());
         service.setServiceOwner(serviceOwner);
+        service.setCustomFields(request.customFields() == null ? Map.of() : request.customFields());
     }
 
     private Person resolveResponsibilityOwner(Long id, ValidationCollector errors) {

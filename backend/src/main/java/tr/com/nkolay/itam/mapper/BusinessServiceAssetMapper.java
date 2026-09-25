@@ -20,6 +20,7 @@ public class BusinessServiceAssetMapper {
                 service.getCriticality(),
                 service.getSla(),
                 toSummary(service.getServiceOwner()),
+                service.getCustomFields(),
                 service.getCreatedAt(),
                 service.getUpdatedAt());
     }

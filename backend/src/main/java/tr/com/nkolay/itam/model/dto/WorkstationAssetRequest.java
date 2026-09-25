@@ -1,5 +1,7 @@
 package tr.com.nkolay.itam.model.dto;
 
+import java.util.Map;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -37,5 +39,7 @@ public record WorkstationAssetRequest(
         Integer diskGb,
 
         Long assignedPersonId,
-        Long departmentId) {
+        Long departmentId,
+
+        Map<String, String> customFields) {
 }

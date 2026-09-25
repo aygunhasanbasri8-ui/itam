@@ -1,5 +1,7 @@
 package tr.com.nkolay.itam.service.asset.impl;
 
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,6 +23,7 @@ import tr.com.nkolay.itam.repository.PersonRepository;
 import tr.com.nkolay.itam.repository.ServerAssetRepository;
 import tr.com.nkolay.itam.repository.spec.ServerAssetSpecifications;
 import tr.com.nkolay.itam.service.asset.ServerAssetService;
+import tr.com.nkolay.itam.service.customfield.CustomFieldValidator;
 import tr.com.nkolay.itam.validation.ValidationCollector;
 
 @Service
@@ -34,15 +37,18 @@ public class ServerAssetServiceImpl implements ServerAssetService {
     private final PersonRepository personRepository;
     private final AssetTypeDefinitionRepository assetTypeDefinitionRepository;
     private final ServerAssetMapper mapper;
+    private final CustomFieldValidator customFieldValidator;
 
     public ServerAssetServiceImpl(ServerAssetRepository serverAssetRepository,
             PersonRepository personRepository,
             AssetTypeDefinitionRepository assetTypeDefinitionRepository,
-            ServerAssetMapper mapper) {
+            ServerAssetMapper mapper,
+            CustomFieldValidator customFieldValidator) {
         this.serverAssetRepository = serverAssetRepository;
         this.personRepository = personRepository;
         this.assetTypeDefinitionRepository = assetTypeDefinitionRepository;
         this.mapper = mapper;
+        this.customFieldValidator = customFieldValidator;
     }
 
     @Override
@@ -99,6 +105,7 @@ public class ServerAssetServiceImpl implements ServerAssetService {
         Person serviceOwner = resolvePerson(request.serviceOwnerId(), "serviceOwnerId", errors);
         Person appResponsible = resolvePerson(request.appResponsibleId(), "appResponsibleId", errors);
         Person osResponsible = resolvePerson(request.osResponsibleId(), "osResponsibleId", errors);
+        customFieldValidator.validate(SERVER_TYPE_CODE, request.customFields(), errors);
 
         errors.throwIfInvalid();
 
@@ -119,6 +126,7 @@ public class ServerAssetServiceImpl implements ServerAssetService {
         server.setServiceOwner(serviceOwner);
         server.setAppResponsible(appResponsible);
         server.setOsResponsible(osResponsible);
+        server.setCustomFields(request.customFields() == null ? Map.of() : request.customFields());
     }
 
     /** responsibilityOwnerId boş geçilirse FIRMA sistem kaydı atanır — bu alan NOT NULL. */

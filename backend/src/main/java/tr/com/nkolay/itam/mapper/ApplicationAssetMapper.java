@@ -23,6 +23,7 @@ public class ApplicationAssetMapper {
                 application.getVendor(),
                 application.getExpiryDate(),
                 application.getInstallPath(),
+                application.getCustomFields(),
                 application.getCreatedAt(),
                 application.getUpdatedAt());
     }

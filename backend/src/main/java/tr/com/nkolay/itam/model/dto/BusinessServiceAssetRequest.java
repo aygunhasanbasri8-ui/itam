@@ -1,5 +1,7 @@
 package tr.com.nkolay.itam.model.dto;
 
+import java.util.Map;
+
 import tr.com.nkolay.itam.enums.ServiceCriticality;
 
 import jakarta.validation.constraints.NotBlank;
@@ -23,5 +25,7 @@ public record BusinessServiceAssetRequest(
         @Size(max = 120, message = "{itam.validation.uzunluk}")
         String sla,
 
-        Long serviceOwnerId) {
+        Long serviceOwnerId,
+
+        Map<String, String> customFields) {
 }

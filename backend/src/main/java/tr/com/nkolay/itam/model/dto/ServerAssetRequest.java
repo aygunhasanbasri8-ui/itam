@@ -1,5 +1,7 @@
 package tr.com.nkolay.itam.model.dto;
 
+import java.util.Map;
+
 import tr.com.nkolay.itam.enums.ServerEnvironment;
 import tr.com.nkolay.itam.validation.ValidHostname;
 import tr.com.nkolay.itam.validation.ValidIpAddress;
@@ -62,5 +64,7 @@ public record ServerAssetRequest(
 
         Long serviceOwnerId,
         Long appResponsibleId,
-        Long osResponsibleId) {
+        Long osResponsibleId,
+
+        Map<String, String> customFields) {
 }

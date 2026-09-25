@@ -1,5 +1,7 @@
 package tr.com.nkolay.itam.model.dto;
 
+import java.util.Map;
+
 import tr.com.nkolay.itam.enums.CloudProvider;
 
 import jakarta.validation.constraints.NotBlank;
@@ -26,5 +28,7 @@ public record CloudAssetRequest(
         String region,
 
         @Size(max = 120, message = "{itam.validation.uzunluk}")
-        String accountId) {
+        String accountId,
+
+        Map<String, String> customFields) {
 }
