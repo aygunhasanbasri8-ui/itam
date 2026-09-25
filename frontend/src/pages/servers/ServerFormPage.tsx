@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createServer, getServer, updateServer } from '../../api/servers'
 import { listActivePeople } from '../../api/people'
 import { extractErrorMessage } from '../../api/client'
+import { Field } from '../../components/Field'
 import type { ServerAssetRequest, ServerEnvironment } from '../../types/server'
 
 const EMPTY_FORM: ServerAssetRequest = {
@@ -185,17 +186,5 @@ export function ServerFormPage() {
         </div>
       </form>
     </div>
-  )
-}
-
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
-  return (
-    <label className="block text-sm">
-      <span className="mb-1 block font-medium text-slate-600">
-        {label}
-        {required && <span className="text-red-500"> *</span>}
-      </span>
-      {children}
-    </label>
   )
 }
