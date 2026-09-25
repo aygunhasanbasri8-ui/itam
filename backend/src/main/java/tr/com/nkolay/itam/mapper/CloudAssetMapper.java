@@ -21,6 +21,7 @@ public class CloudAssetMapper {
                 cloud.getInstanceType(),
                 cloud.getRegion(),
                 cloud.getAccountId(),
+                cloud.getCustomFields(),
                 cloud.getCreatedAt(),
                 cloud.getUpdatedAt());
     }

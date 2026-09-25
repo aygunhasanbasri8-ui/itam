@@ -1,6 +1,7 @@
 package tr.com.nkolay.itam.model.dto;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 
 import tr.com.nkolay.itam.enums.AssetStatus;
 import tr.com.nkolay.itam.enums.CloudProvider;
@@ -15,6 +16,7 @@ public record CloudAssetResponse(
         String instanceType,
         String region,
         String accountId,
+        Map<String, String> customFields,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt) {
 }

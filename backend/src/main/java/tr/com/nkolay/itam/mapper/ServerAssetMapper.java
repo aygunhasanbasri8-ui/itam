@@ -37,6 +37,7 @@ public class ServerAssetMapper {
                 toSummary(server.getServiceOwner()),
                 toSummary(server.getAppResponsible()),
                 toSummary(server.getOsResponsible()),
+                server.getCustomFields(),
                 server.getCreatedAt(),
                 server.getUpdatedAt());
     }

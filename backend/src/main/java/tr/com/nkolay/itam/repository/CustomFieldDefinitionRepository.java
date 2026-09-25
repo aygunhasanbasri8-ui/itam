@@ -1,0 +1,16 @@
+package tr.com.nkolay.itam.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import tr.com.nkolay.itam.model.entity.CustomFieldDefinition;
+
+public interface CustomFieldDefinitionRepository extends JpaRepository<CustomFieldDefinition, Long> {
+
+    List<CustomFieldDefinition> findByAssetTypeCodeOrderBySortOrder(String assetTypeCode);
+
+    List<CustomFieldDefinition> findByAssetTypeCodeAndActiveTrueOrderBySortOrder(String assetTypeCode);
+
+    boolean existsByAssetTypeCodeAndFieldKey(String assetTypeCode, String fieldKey);
+}

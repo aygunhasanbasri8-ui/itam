@@ -1,6 +1,7 @@
 package tr.com.nkolay.itam.service.asset.impl;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,7 @@ import tr.com.nkolay.itam.repository.AssetTypeDefinitionRepository;
 import tr.com.nkolay.itam.repository.PersonRepository;
 import tr.com.nkolay.itam.repository.spec.ApplicationAssetSpecifications;
 import tr.com.nkolay.itam.service.asset.ApplicationAssetService;
+import tr.com.nkolay.itam.service.customfield.CustomFieldValidator;
 import tr.com.nkolay.itam.validation.ValidationCollector;
 
 @Service
@@ -34,15 +36,18 @@ public class ApplicationAssetServiceImpl implements ApplicationAssetService {
     private final PersonRepository personRepository;
     private final AssetTypeDefinitionRepository assetTypeDefinitionRepository;
     private final ApplicationAssetMapper mapper;
+    private final CustomFieldValidator customFieldValidator;
 
     public ApplicationAssetServiceImpl(ApplicationAssetRepository applicationAssetRepository,
             PersonRepository personRepository,
             AssetTypeDefinitionRepository assetTypeDefinitionRepository,
-            ApplicationAssetMapper mapper) {
+            ApplicationAssetMapper mapper,
+            CustomFieldValidator customFieldValidator) {
         this.applicationAssetRepository = applicationAssetRepository;
         this.personRepository = personRepository;
         this.assetTypeDefinitionRepository = assetTypeDefinitionRepository;
         this.mapper = mapper;
+        this.customFieldValidator = customFieldValidator;
     }
 
     @Override
@@ -89,6 +94,7 @@ public class ApplicationAssetServiceImpl implements ApplicationAssetService {
     private void applyRequest(ApplicationAsset application, ApplicationAssetRequest request) {
         ValidationCollector errors = ValidationCollector.create();
         Person owner = resolveResponsibilityOwner(request.responsibilityOwnerId(), errors);
+        customFieldValidator.validate(APPLICATION_TYPE_CODE, request.customFields(), errors);
         errors.throwIfInvalid();
 
         application.setAssetName(request.assetName());
@@ -100,6 +106,7 @@ public class ApplicationAssetServiceImpl implements ApplicationAssetService {
         application.setVendor(request.vendor());
         application.setExpiryDate(request.expiryDate());
         application.setInstallPath(request.installPath());
+        application.setCustomFields(request.customFields() == null ? Map.of() : request.customFields());
     }
 
     private Person resolveResponsibilityOwner(Long id, ValidationCollector errors) {

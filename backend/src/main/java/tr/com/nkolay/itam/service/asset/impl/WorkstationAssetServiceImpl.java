@@ -1,5 +1,7 @@
 package tr.com.nkolay.itam.service.asset.impl;
 
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,6 +24,7 @@ import tr.com.nkolay.itam.repository.PersonRepository;
 import tr.com.nkolay.itam.repository.WorkstationAssetRepository;
 import tr.com.nkolay.itam.repository.spec.WorkstationAssetSpecifications;
 import tr.com.nkolay.itam.service.asset.WorkstationAssetService;
+import tr.com.nkolay.itam.service.customfield.CustomFieldValidator;
 import tr.com.nkolay.itam.validation.ValidationCollector;
 
 @Service
@@ -35,17 +38,20 @@ public class WorkstationAssetServiceImpl implements WorkstationAssetService {
     private final DepartmentRepository departmentRepository;
     private final AssetTypeDefinitionRepository assetTypeDefinitionRepository;
     private final WorkstationAssetMapper mapper;
+    private final CustomFieldValidator customFieldValidator;
 
     public WorkstationAssetServiceImpl(WorkstationAssetRepository workstationAssetRepository,
             PersonRepository personRepository,
             DepartmentRepository departmentRepository,
             AssetTypeDefinitionRepository assetTypeDefinitionRepository,
-            WorkstationAssetMapper mapper) {
+            WorkstationAssetMapper mapper,
+            CustomFieldValidator customFieldValidator) {
         this.workstationAssetRepository = workstationAssetRepository;
         this.personRepository = personRepository;
         this.departmentRepository = departmentRepository;
         this.assetTypeDefinitionRepository = assetTypeDefinitionRepository;
         this.mapper = mapper;
+        this.customFieldValidator = customFieldValidator;
     }
 
     @Override
@@ -96,6 +102,7 @@ public class WorkstationAssetServiceImpl implements WorkstationAssetService {
         Person owner = resolveResponsibilityOwner(request.responsibilityOwnerId(), errors);
         Person assignedPerson = resolvePerson(request.assignedPersonId(), "assignedPersonId", errors);
         Department department = resolveDepartment(request.departmentId(), errors);
+        customFieldValidator.validate(WORKSTATION_TYPE_CODE, request.customFields(), errors);
 
         errors.throwIfInvalid();
 
@@ -109,6 +116,7 @@ public class WorkstationAssetServiceImpl implements WorkstationAssetService {
         workstation.setDiskGb(request.diskGb());
         workstation.setAssignedPerson(assignedPerson);
         workstation.setDepartment(department);
+        workstation.setCustomFields(request.customFields() == null ? Map.of() : request.customFields());
     }
 
     private Person resolveResponsibilityOwner(Long id, ValidationCollector errors) {

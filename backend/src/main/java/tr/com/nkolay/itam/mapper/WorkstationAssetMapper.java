@@ -26,6 +26,7 @@ public class WorkstationAssetMapper {
                 workstation.getDiskGb(),
                 toPersonSummary(workstation.getAssignedPerson()),
                 toDepartmentSummary(workstation.getDepartment()),
+                workstation.getCustomFields(),
                 workstation.getCreatedAt(),
                 workstation.getUpdatedAt());
     }
