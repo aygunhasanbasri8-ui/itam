@@ -30,7 +30,6 @@ Kurum bünyesindeki tüm donanım, yazılım ve iş servisi varlıklarının tek
 ### 1. Veritabanını başlat
 
 ```bash
-cd docker
 docker compose up -d
 ```
 
