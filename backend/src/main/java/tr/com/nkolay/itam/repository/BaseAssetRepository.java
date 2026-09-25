@@ -1,6 +1,9 @@
 package tr.com.nkolay.itam.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import tr.com.nkolay.itam.model.entity.BaseAsset;
 
@@ -11,4 +14,14 @@ import tr.com.nkolay.itam.model.entity.BaseAsset;
  * kurtarıyor (JOINED kalıtım sayesinde tek sorguyla hepsi gelir).
  */
 public interface BaseAssetRepository extends JpaRepository<BaseAsset, Long> {
+
+    long countByDeletedFalse();
+
+    /** Dashboard özet ekranı için durum bazlı dağılım; her satır [AssetStatus, count]. */
+    @Query("select b.status, count(b) from BaseAsset b where b.deleted = false group by b.status")
+    List<Object[]> countByStatusGrouped();
+
+    /** Dashboard özet ekranı için asset tipi bazlı dağılım; her satır [assetTypeCode, count]. */
+    @Query("select b.assetType.code, count(b) from BaseAsset b where b.deleted = false group by b.assetType.code")
+    List<Object[]> countByAssetTypeGrouped();
 }
