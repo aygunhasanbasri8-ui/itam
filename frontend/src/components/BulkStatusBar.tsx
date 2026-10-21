@@ -2,13 +2,13 @@ import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { bulkUpdateStatus } from '../api/assets'
 import { extractErrorMessage } from '../api/client'
-import { useAuth } from '../auth/AuthContext'
+import { useIsAdmin } from '../auth/useIsAdmin'
 import { ASSET_STATUS_LABELS, type AssetStatus } from '../types/common'
 import type { Selection } from '../hooks/useSelection'
 
 export function BulkStatusBar({ selection, queryKey }: { selection: Selection; queryKey: string }) {
   const queryClient = useQueryClient()
-  const { role } = useAuth()
+  const isAdmin = useIsAdmin()
   const [status, setStatus] = useState<AssetStatus>('ACTIVE')
   const [error, setError] = useState<string | null>(null)
 
@@ -23,7 +23,7 @@ export function BulkStatusBar({ selection, queryKey }: { selection: Selection; q
     onError: (err) => setError(extractErrorMessage(err)),
   })
 
-  if (role !== 'ADMIN' || selection.ids.length === 0) {
+  if (!isAdmin || selection.ids.length === 0) {
     return null
   }
 

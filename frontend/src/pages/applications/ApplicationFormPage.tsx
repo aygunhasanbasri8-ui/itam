@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createApplication, getApplication, updateApplication } from '../../api/applications'
 import { listActivePeople } from '../../api/people'
 import { extractErrorMessage } from '../../api/client'
+import { useIsAdmin } from '../../auth/useIsAdmin'
 import { Field } from '../../components/Field'
 import { CustomFieldInputs } from '../../components/CustomFieldInputs'
 import { DependencyPanel } from '../../components/DependencyPanel'
@@ -15,6 +16,7 @@ const EMPTY_FORM: ApplicationAssetRequest = { assetName: '' }
 export function ApplicationFormPage() {
   const { id } = useParams()
   const isEdit = Boolean(id)
+  const isAdmin = useIsAdmin()
   const navigate = useNavigate()
 
   const [form, setForm] = useState<ApplicationAssetRequest>(EMPTY_FORM)
@@ -73,96 +75,99 @@ export function ApplicationFormPage() {
       <h1 className="text-xl font-semibold text-slate-800">{isEdit ? 'Uygulamayı Düzenle' : 'Yeni Uygulama'}</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-200 bg-white p-6">
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Asset Adı" required>
-            <input
+        <fieldset disabled={!isAdmin} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Asset Adı" required>
+              <input
+                className="input"
+                value={form.assetName}
+                onChange={(e) => setForm({ ...form, assetName: e.target.value })}
+                required
+              />
+            </Field>
+
+            <Field label="Sürüm">
+              <input className="input" value={form.version ?? ''} onChange={(e) => setForm({ ...form, version: e.target.value })} />
+            </Field>
+
+            <Field label="Üretici">
+              <input className="input" value={form.vendor ?? ''} onChange={(e) => setForm({ ...form, vendor: e.target.value })} />
+            </Field>
+
+            <Field label="Lisans Tipi">
+              <input
+                className="input"
+                value={form.licenseType ?? ''}
+                onChange={(e) => setForm({ ...form, licenseType: e.target.value })}
+              />
+            </Field>
+
+            <Field label="Lisans Adedi">
+              <input
+                type="number"
+                className="input"
+                value={form.licenseCount ?? ''}
+                onChange={(e) => setForm({ ...form, licenseCount: e.target.value ? Number(e.target.value) : undefined })}
+              />
+            </Field>
+
+            <Field label="Lisans Bitiş Tarihi">
+              <input
+                type="date"
+                className="input"
+                value={form.expiryDate ?? ''}
+                onChange={(e) => setForm({ ...form, expiryDate: e.target.value })}
+              />
+            </Field>
+
+            <Field label="Kurulum Yolu">
+              <input
+                className="input"
+                value={form.installPath ?? ''}
+                onChange={(e) => setForm({ ...form, installPath: e.target.value })}
+              />
+            </Field>
+
+            <Field label="Sorumlu Kişi">
+              <select
+                className="input"
+                value={form.responsibilityOwnerId ?? ''}
+                onChange={(e) =>
+                  setForm({ ...form, responsibilityOwnerId: e.target.value ? Number(e.target.value) : null })
+                }
+              >
+                <option value="">FIRMA (varsayılan)</option>
+                {people?.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.fullName}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </div>
+
+          <Field label="Notlar">
+            <textarea
               className="input"
-              value={form.assetName}
-              onChange={(e) => setForm({ ...form, assetName: e.target.value })}
-              required
+              rows={3}
+              value={form.notes ?? ''}
+              onChange={(e) => setForm({ ...form, notes: e.target.value })}
             />
           </Field>
 
-          <Field label="Sürüm">
-            <input className="input" value={form.version ?? ''} onChange={(e) => setForm({ ...form, version: e.target.value })} />
-          </Field>
-
-          <Field label="Üretici">
-            <input className="input" value={form.vendor ?? ''} onChange={(e) => setForm({ ...form, vendor: e.target.value })} />
-          </Field>
-
-          <Field label="Lisans Tipi">
-            <input
-              className="input"
-              value={form.licenseType ?? ''}
-              onChange={(e) => setForm({ ...form, licenseType: e.target.value })}
-            />
-          </Field>
-
-          <Field label="Lisans Adedi">
-            <input
-              type="number"
-              className="input"
-              value={form.licenseCount ?? ''}
-              onChange={(e) => setForm({ ...form, licenseCount: e.target.value ? Number(e.target.value) : undefined })}
-            />
-          </Field>
-
-          <Field label="Lisans Bitiş Tarihi">
-            <input
-              type="date"
-              className="input"
-              value={form.expiryDate ?? ''}
-              onChange={(e) => setForm({ ...form, expiryDate: e.target.value })}
-            />
-          </Field>
-
-          <Field label="Kurulum Yolu">
-            <input
-              className="input"
-              value={form.installPath ?? ''}
-              onChange={(e) => setForm({ ...form, installPath: e.target.value })}
-            />
-          </Field>
-
-          <Field label="Sorumlu Kişi">
-            <select
-              className="input"
-              value={form.responsibilityOwnerId ?? ''}
-              onChange={(e) =>
-                setForm({ ...form, responsibilityOwnerId: e.target.value ? Number(e.target.value) : null })
-              }
-            >
-              <option value="">FIRMA (varsayılan)</option>
-              {people?.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.fullName}
-                </option>
-              ))}
-            </select>
-          </Field>
-        </div>
-
-        <Field label="Notlar">
-          <textarea
-            className="input"
-            rows={3}
-            value={form.notes ?? ''}
-            onChange={(e) => setForm({ ...form, notes: e.target.value })}
+          <CustomFieldInputs
+            assetTypeCode="APPLICATION"
+            values={form.customFields}
+            onChange={(customFields) => setForm({ ...form, customFields })}
           />
-        </Field>
-
-        <CustomFieldInputs
-          assetTypeCode="APPLICATION"
-          values={form.customFields}
-          onChange={(customFields) => setForm({ ...form, customFields })}
-        />
+        </fieldset>
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 
         <div className="flex gap-3">
           <button
             type="submit"
+            hidden={!isAdmin}
             disabled={submitting}
             className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
           >

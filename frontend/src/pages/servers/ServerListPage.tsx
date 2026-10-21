@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import { useIsAdmin } from '../../auth/useIsAdmin'
 import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { ExportButton } from '../../components/ExportButton'
 import { useSelection } from '../../hooks/useSelection'
@@ -10,6 +11,7 @@ import { listServers } from '../../api/servers'
 import { ASSET_STATUS_LABELS } from '../../types/common'
 
 export function ServerListPage() {
+  const isAdmin = useIsAdmin()
   const [hostname, setHostname] = useState('')
   const [environment, setEnvironment] = useState('')
   const [page, setPage] = useState(0)
@@ -35,9 +37,11 @@ export function ServerListPage() {
         <h1 className="text-xl font-semibold text-slate-800">Sunucular</h1>
         <div className="flex gap-2">
           <ExportButton path="/servers/export" params={{ hostname: hostname || undefined, environment: environment || undefined }} />
-          <Link to="/servers/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
-            Yeni Sunucu
-          </Link>
+          {isAdmin && (
+            <Link to="/servers/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
+              Yeni Sunucu
+            </Link>
+          )}
         </div>
       </div>
 

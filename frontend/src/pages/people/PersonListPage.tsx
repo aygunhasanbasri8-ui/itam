@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import { useIsAdmin } from '../../auth/useIsAdmin'
 import { listPeople } from '../../api/people'
 import { listActiveDepartments } from '../../api/departments'
 import { Pagination } from '../../components/Pagination'
 
 export function PersonListPage() {
+  const isAdmin = useIsAdmin()
   const [search, setSearch] = useState('')
   const [departmentId, setDepartmentId] = useState('')
   const [onlyActive, setOnlyActive] = useState(true)
@@ -29,9 +31,11 @@ export function PersonListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-slate-800">Kişiler</h1>
-        <Link to="/people/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
-          Yeni Kişi
-        </Link>
+        {isAdmin && (
+          <Link to="/people/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
+            Yeni Kişi
+          </Link>
+        )}
       </div>
 
       <div className="flex items-center gap-3">

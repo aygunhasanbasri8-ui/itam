@@ -4,7 +4,7 @@ import { createDependency, deleteDependency, getDependencyTree, listAssetDepende
 import { searchAssets } from '../api/assetSearch'
 import { useDebouncedValue } from '../hooks/useDebouncedValue'
 import { extractErrorMessage } from '../api/client'
-import { useAuth } from '../auth/AuthContext'
+import { useIsAdmin } from '../auth/useIsAdmin'
 import { ASSET_TYPE_LABELS } from '../types/assetType'
 import type { DependencyTreeNode, DependencyType } from '../types/dependency'
 
@@ -18,8 +18,7 @@ type Direction = 'OUTGOING' | 'INCOMING'
 
 export function DependencyPanel({ assetId }: { assetId: number }) {
   const queryClient = useQueryClient()
-  const { role } = useAuth()
-  const canEdit = role === 'ADMIN'
+  const canEdit = useIsAdmin()
 
   const { data: edges } = useQuery({
     queryKey: ['dependencies', assetId],

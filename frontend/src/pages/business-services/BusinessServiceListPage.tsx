@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import { useIsAdmin } from '../../auth/useIsAdmin'
 import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { ExportButton } from '../../components/ExportButton'
 import { useSelection } from '../../hooks/useSelection'
@@ -16,6 +17,7 @@ const CRITICALITY_LABELS: Record<string, string> = {
 }
 
 export function BusinessServiceListPage() {
+  const isAdmin = useIsAdmin()
   const [criticality, setCriticality] = useState('')
   const [page, setPage] = useState(0)
   const selection = useSelection()
@@ -34,9 +36,11 @@ export function BusinessServiceListPage() {
         <h1 className="text-xl font-semibold text-slate-800">İş Servisleri</h1>
         <div className="flex gap-2">
           <ExportButton path="/business-services/export" params={{ criticality: criticality || undefined }} />
-          <Link to="/business-services/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
-            Yeni İş Servisi
-          </Link>
+          {isAdmin && (
+            <Link to="/business-services/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
+              Yeni İş Servisi
+            </Link>
+          )}
         </div>
       </div>
 

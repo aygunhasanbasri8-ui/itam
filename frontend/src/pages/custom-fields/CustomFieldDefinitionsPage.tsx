@@ -6,7 +6,7 @@ import {
   updateCustomFieldDefinition,
 } from '../../api/customFields'
 import { extractErrorMessage } from '../../api/client'
-import { useAuth } from '../../auth/AuthContext'
+import { useIsAdmin } from '../../auth/useIsAdmin'
 import { Field } from '../../components/Field'
 import { ASSET_TYPE_LABELS, type AssetTypeCode } from '../../types/assetType'
 import type {
@@ -24,8 +24,7 @@ const DATA_TYPE_LABELS: Record<CustomFieldType, string> = {
 
 export function CustomFieldDefinitionsPage() {
   const [assetType, setAssetType] = useState<AssetTypeCode>('SERVER')
-  const { role } = useAuth()
-  const canEdit = role === 'ADMIN'
+  const canEdit = useIsAdmin()
 
   const { data: definitions, isLoading, isError } = useQuery({
     queryKey: ['custom-field-definitions', assetType],
