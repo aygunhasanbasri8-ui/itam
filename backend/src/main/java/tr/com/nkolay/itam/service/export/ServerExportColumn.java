@@ -11,7 +11,7 @@ import tr.com.nkolay.itam.model.entity.ServerAsset;
  * environment,os"); hiç seçmezse hepsi yazılır. Yeni bir sunucu alanı
  * eklendiğinde sadece burada yeni bir sabit tanımlamak yeterli.
  */
-public enum ServerExportColumn {
+public enum ServerExportColumn implements AssetColumn<ServerAsset> {
 
     ID("id", "ID", a -> a.getId()),
     ASSET_NAME("assetName", "Ad", ServerAsset::getAssetName),
@@ -43,14 +43,17 @@ public enum ServerExportColumn {
         this.valueOf = valueOf;
     }
 
+    @Override
     public String code() {
         return code;
     }
 
+    @Override
     public String header() {
         return header;
     }
 
+    @Override
     public Object valueOf(ServerAsset asset) {
         return valueOf.apply(asset);
     }

@@ -6,7 +6,7 @@ import tr.com.nkolay.itam.model.entity.CloudAsset;
 import tr.com.nkolay.itam.model.entity.Person;
 
 /** ServerExportColumn ile aynı desen — bkz. oradaki açıklama. */
-public enum CloudExportColumn {
+public enum CloudExportColumn implements AssetColumn<CloudAsset> {
 
     ID("id", "ID", a -> a.getId()),
     ASSET_NAME("assetName", "Ad", CloudAsset::getAssetName),
@@ -30,14 +30,17 @@ public enum CloudExportColumn {
         this.valueOf = valueOf;
     }
 
+    @Override
     public String code() {
         return code;
     }
 
+    @Override
     public String header() {
         return header;
     }
 
+    @Override
     public Object valueOf(CloudAsset asset) {
         return valueOf.apply(asset);
     }
