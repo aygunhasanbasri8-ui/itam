@@ -5,7 +5,10 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Function;
 
 import org.hibernate.envers.AuditReader;
@@ -107,8 +110,24 @@ public class AssetAuditServiceImpl implements AssetAuditService {
         addIfChanged(changes, "assetType",
                 value(previous, p -> p.getAssetType() == null ? null : p.getAssetType().getCode()),
                 current.getAssetType() == null ? null : current.getAssetType().getCode());
+        addCustomFieldChanges(changes, previous == null ? null : previous.getCustomFields(),
+                current.getCustomFields());
 
         return changes;
+    }
+
+    // Özel alanlar tek JSONB kolonda duruyor; kolonu bütün olarak göstermek yerine
+    // anahtar bazında "customFields.kabinNo" gibi ayrı satırlar üretiyoruz.
+    private void addCustomFieldChanges(List<FieldChangeDto> changes, Map<String, String> before,
+            Map<String, String> after) {
+        Map<String, String> oldValues = before == null ? Map.of() : before;
+        Map<String, String> newValues = after == null ? Map.of() : after;
+
+        Set<String> keys = new TreeSet<>(oldValues.keySet());
+        keys.addAll(newValues.keySet());
+        for (String key : keys) {
+            addIfChanged(changes, "customFields." + key, oldValues.get(key), newValues.get(key));
+        }
     }
 
     private String ownerId(BaseAsset asset) {
