@@ -13,6 +13,8 @@ public interface AssetDependencyRepository extends JpaRepository<AssetDependency
 
     boolean existsByParentAssetIdAndChildAssetId(Long parentAssetId, Long childAssetId);
 
+    boolean existsByParentAssetIdOrChildAssetId(Long parentAssetId, Long childAssetId);
+
     /** Bir asset'in doğrudan bağımlı olduğu veya ona bağımlı olan kenarlar; isimler tek sorguda gelir. */
     @Query("select d from AssetDependency d "
             + "join fetch d.parentAsset join fetch d.childAsset "

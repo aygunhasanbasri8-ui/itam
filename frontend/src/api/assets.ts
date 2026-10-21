@@ -1,6 +1,10 @@
 import { apiClient } from './client'
 import type { AssetStatus } from '../types/common'
 
+export async function deleteAsset(id: number): Promise<void> {
+  await apiClient.delete(`/assets/${id}`)
+}
+
 export async function bulkUpdateStatus(assetIds: number[], status: AssetStatus): Promise<number> {
   const response = await apiClient.patch<{ updatedCount: number }>('/assets/bulk-status', { assetIds, status })
   return response.data.updatedCount

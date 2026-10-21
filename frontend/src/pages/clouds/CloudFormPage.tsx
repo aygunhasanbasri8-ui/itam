@@ -7,6 +7,7 @@ import { extractErrorMessage } from '../../api/client'
 import { useIsAdmin } from '../../auth/useIsAdmin'
 import { Field } from '../../components/Field'
 import { CustomFieldInputs } from '../../components/CustomFieldInputs'
+import { DeleteAssetButton } from '../../components/DeleteAssetButton'
 import { DependencyPanel } from '../../components/DependencyPanel'
 import { AuditTrailPanel } from '../../components/AuditTrailPanel'
 import type { CloudAssetRequest, CloudProvider } from '../../types/cloud'
@@ -169,6 +170,9 @@ export function CloudFormPage() {
           >
             Vazgeç
           </button>
+          {isEdit && isAdmin && (
+            <DeleteAssetButton assetId={Number(id)} onDeleted={() => navigate('/clouds')} />
+          )}
         </div>
       </form>
 
