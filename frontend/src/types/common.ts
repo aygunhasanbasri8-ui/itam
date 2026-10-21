@@ -10,6 +10,12 @@ export interface DepartmentSummary {
 
 export type AssetStatus = 'ACTIVE' | 'RETIRED' | 'MAINTENANCE'
 
+export const ASSET_STATUS_LABELS: Record<AssetStatus, string> = {
+  ACTIVE: 'Aktif',
+  RETIRED: 'Hizmet Dışı',
+  MAINTENANCE: 'Bakımda',
+}
+
 export interface PageResponse<T> {
   content: T[]
   page: number

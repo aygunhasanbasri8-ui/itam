@@ -1,12 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { getDashboardSummary } from '../api/dashboard'
 import { ASSET_TYPE_LABELS } from '../types/assetType'
-
-const STATUS_LABELS: Record<string, string> = {
-  ACTIVE: 'Aktif',
-  RETIRED: 'Hizmet Dışı',
-  MAINTENANCE: 'Bakımda',
-}
+import { ASSET_STATUS_LABELS } from '../types/common'
 
 function StatCard({ label, value, accent }: { label: string; value: number | string; accent?: string }) {
   return (
@@ -72,7 +67,7 @@ export function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <DistributionCard title="Asset Tipi Dağılımı" data={data.countByAssetType} labels={ASSET_TYPE_LABELS} />
-        <DistributionCard title="Durum Dağılımı" data={data.countByStatus} labels={STATUS_LABELS} />
+        <DistributionCard title="Durum Dağılımı" data={data.countByStatus} labels={ASSET_STATUS_LABELS} />
         <DistributionCard title="Sunucu Ortam Dağılımı" data={data.countByEnvironment} />
       </div>
     </div>
