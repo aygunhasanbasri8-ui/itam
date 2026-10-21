@@ -44,8 +44,4 @@ public class JwtService {
     public Claims parse(String token) {
         return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
     }
-
-    public String roleOf(Claims claims) {
-        return claims.get(ROLE_CLAIM, String.class);
-    }
 }
