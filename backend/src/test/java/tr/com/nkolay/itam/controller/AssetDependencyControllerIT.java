@@ -52,6 +52,9 @@ class AssetDependencyControllerIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.children[0].dependencyType").value("USES"))
                 .andExpect(jsonPath("$.children[0].children[0].assetId").value(sunucu))
                 .andExpect(jsonPath("$.children[0].children[0].dependencyType").value("RUNS_ON"));
+
+        mockMvc.perform(get("/api/v1/assets/{id}/dependencies", sunucu))
+                .andExpect(jsonPath("$[0].createdBy").value("test-admin"));
     }
 
     @Test
