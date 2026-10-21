@@ -10,6 +10,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import tr.com.nkolay.itam.repository.AppUserRepository;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -30,9 +32,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtService jwtService;
+    private final AppUserRepository appUserRepository;
 
-    public JwtAuthenticationFilter(JwtService jwtService) {
+    public JwtAuthenticationFilter(JwtService jwtService, AppUserRepository appUserRepository) {
         this.jwtService = jwtService;
+        this.appUserRepository = appUserRepository;
     }
 
     @Override
@@ -44,13 +48,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
                 Claims claims = jwtService.parse(header.substring(BEARER_PREFIX.length()));
-                String username = claims.getSubject();
-                String role = jwtService.roleOf(claims);
 
-                var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
-                var authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                // Token 8 saat geçerli; pasife alınan kullanıcı o süre boyunca içeride
+                // kalmasın, rol değişikliği de hemen yansısın diye her istekte kullanıcıya bakıyoruz.
+                appUserRepository.findByUsernameAndActiveTrue(claims.getSubject()).ifPresent(user -> {
+                    var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+                    var authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null,
+                            authorities);
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                });
             } catch (JwtException | IllegalArgumentException e) {
                 // Bozuk/süresi geçmiş token: kimliksiz devam, authorizeHttpRequests 401/403 verir.
                 SecurityContextHolder.clearContext();
