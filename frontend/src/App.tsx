@@ -17,6 +17,7 @@ import { ApplicationFormPage } from './pages/applications/ApplicationFormPage'
 import { BusinessServiceListPage } from './pages/business-services/BusinessServiceListPage'
 import { BusinessServiceFormPage } from './pages/business-services/BusinessServiceFormPage'
 import { CustomFieldDefinitionsPage } from './pages/custom-fields/CustomFieldDefinitionsPage'
+import { AssetTypesPage } from './pages/asset-types/AssetTypesPage'
 import { PersonListPage } from './pages/people/PersonListPage'
 import { PersonFormPage } from './pages/people/PersonFormPage'
 import { DepartmentListPage } from './pages/departments/DepartmentListPage'
@@ -64,6 +65,7 @@ export default function App() {
               <Route path="/departments" element={<DepartmentListPage />} />
               <Route path="/departments/new" element={<DepartmentFormPage />} />
               <Route path="/departments/:id" element={<DepartmentFormPage />} />
+              <Route path="/asset-types" element={<AssetTypesPage />} />
               <Route path="/custom-fields" element={<CustomFieldDefinitionsPage />} />
               <Route path="/users" element={<UserListPage />} />
               <Route path="/users/new" element={<UserFormPage />} />
