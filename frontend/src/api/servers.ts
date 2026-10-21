@@ -5,6 +5,7 @@ import type { ServerAssetRequest, ServerAssetResponse } from '../types/server'
 export interface ServerListParams {
   page?: number
   size?: number
+  responsibilityOwnerId?: number
   hostname?: string
   environment?: string
   status?: string

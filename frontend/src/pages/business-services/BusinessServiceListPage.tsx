@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useIsAdmin } from '../../auth/useIsAdmin'
 import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { ExportButton } from '../../components/ExportButton'
+import { OwnerFilter } from '../../components/OwnerFilter'
 import { useSelection } from '../../hooks/useSelection'
 import { formatCustomFieldValue, useListCustomFields } from '../../hooks/useListCustomFields'
 import { Pagination } from '../../components/Pagination'
@@ -19,13 +20,20 @@ const CRITICALITY_LABELS: Record<string, string> = {
 export function BusinessServiceListPage() {
   const isAdmin = useIsAdmin()
   const [criticality, setCriticality] = useState('')
+  const [ownerId, setOwnerId] = useState('')
   const [page, setPage] = useState(0)
   const selection = useSelection()
   const listFields = useListCustomFields('BUSINESS_SERVICE')
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['business-services', { criticality, page }],
-    queryFn: () => listBusinessServices({ criticality: criticality || undefined, page, size: 20 }),
+    queryKey: ['business-services', { criticality, ownerId, page }],
+    queryFn: () =>
+      listBusinessServices({
+        criticality: criticality || undefined,
+        responsibilityOwnerId: ownerId ? Number(ownerId) : undefined,
+        page,
+        size: 20,
+      }),
   })
 
   const pageIds = data?.content.map((item) => item.id) ?? []
@@ -35,7 +43,13 @@ export function BusinessServiceListPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-slate-800">İş Servisleri</h1>
         <div className="flex gap-2">
-          <ExportButton path="/business-services/export" params={{ criticality: criticality || undefined }} />
+          <ExportButton
+            path="/business-services/export"
+            params={{
+              criticality: criticality || undefined,
+              responsibilityOwnerId: ownerId || undefined,
+            }}
+          />
           {isAdmin && (
             <Link to="/business-services/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
               Yeni İş Servisi
@@ -57,6 +71,14 @@ export function BusinessServiceListPage() {
         <option value="MID">Orta</option>
         <option value="LOW">Düşük</option>
       </select>
+
+      <OwnerFilter
+        value={ownerId}
+        onChange={(value) => {
+          setPage(0)
+          setOwnerId(value)
+        }}
+      />
 
       <BulkStatusBar selection={selection} queryKey="business-services" />
 

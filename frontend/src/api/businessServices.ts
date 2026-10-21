@@ -5,6 +5,7 @@ import type { BusinessServiceAssetRequest, BusinessServiceAssetResponse } from '
 export interface BusinessServiceListParams {
   page?: number
   size?: number
+  responsibilityOwnerId?: number
   criticality?: string
   status?: string
 }

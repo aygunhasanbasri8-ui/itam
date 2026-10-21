@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useIsAdmin } from '../../auth/useIsAdmin'
 import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { ExportButton } from '../../components/ExportButton'
+import { OwnerFilter } from '../../components/OwnerFilter'
 import { useSelection } from '../../hooks/useSelection'
 import { formatCustomFieldValue, useListCustomFields } from '../../hooks/useListCustomFields'
 import { Pagination } from '../../components/Pagination'
@@ -13,13 +14,20 @@ import { listClouds } from '../../api/clouds'
 export function CloudListPage() {
   const isAdmin = useIsAdmin()
   const [provider, setProvider] = useState('')
+  const [ownerId, setOwnerId] = useState('')
   const [page, setPage] = useState(0)
   const selection = useSelection()
   const listFields = useListCustomFields('CLOUD')
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['clouds', { provider, page }],
-    queryFn: () => listClouds({ provider: provider || undefined, page, size: 20 }),
+    queryKey: ['clouds', { provider, ownerId, page }],
+    queryFn: () =>
+      listClouds({
+        provider: provider || undefined,
+        responsibilityOwnerId: ownerId ? Number(ownerId) : undefined,
+        page,
+        size: 20,
+      }),
   })
 
   const pageIds = data?.content.map((item) => item.id) ?? []
@@ -29,7 +37,13 @@ export function CloudListPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-slate-800">Cloud Varlıkları</h1>
         <div className="flex gap-2">
-          <ExportButton path="/cloud-assets/export" params={{ provider: provider || undefined }} />
+          <ExportButton
+            path="/cloud-assets/export"
+            params={{
+              provider: provider || undefined,
+              responsibilityOwnerId: ownerId || undefined,
+            }}
+          />
           {isAdmin && (
             <Link to="/clouds/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
               Yeni Cloud Varlığı
@@ -52,6 +66,14 @@ export function CloudListPage() {
         <option value="GCP">GCP</option>
         <option value="OTHER">OTHER</option>
       </select>
+
+      <OwnerFilter
+        value={ownerId}
+        onChange={(value) => {
+          setPage(0)
+          setOwnerId(value)
+        }}
+      />
 
       <BulkStatusBar selection={selection} queryKey="clouds" />
 

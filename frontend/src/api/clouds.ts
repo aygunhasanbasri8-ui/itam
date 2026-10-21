@@ -5,6 +5,7 @@ import type { CloudAssetRequest, CloudAssetResponse } from '../types/cloud'
 export interface CloudListParams {
   page?: number
   size?: number
+  responsibilityOwnerId?: number
   provider?: string
   region?: string
   status?: string

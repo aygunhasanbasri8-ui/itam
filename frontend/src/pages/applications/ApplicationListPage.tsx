@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useIsAdmin } from '../../auth/useIsAdmin'
 import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { ExportButton } from '../../components/ExportButton'
+import { OwnerFilter } from '../../components/OwnerFilter'
 import { useSelection } from '../../hooks/useSelection'
 import { formatCustomFieldValue, useListCustomFields } from '../../hooks/useListCustomFields'
 import { Pagination } from '../../components/Pagination'
@@ -16,14 +17,21 @@ export function ApplicationListPage() {
   const [vendor, setVendor] = useState('')
   // Dashboard'daki lisans kartları buraya ?expiryBefore= ile yönlendiriyor
   const [expiryBefore, setExpiryBefore] = useState(searchParams.get('expiryBefore') ?? '')
+  const [ownerId, setOwnerId] = useState('')
   const [page, setPage] = useState(0)
   const selection = useSelection()
   const listFields = useListCustomFields('APPLICATION')
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['applications', { vendor, expiryBefore, page }],
+    queryKey: ['applications', { vendor, expiryBefore, ownerId, page }],
     queryFn: () =>
-      listApplications({ vendor: vendor || undefined, expiryBefore: expiryBefore || undefined, page, size: 20 }),
+      listApplications({
+        vendor: vendor || undefined,
+        expiryBefore: expiryBefore || undefined,
+        responsibilityOwnerId: ownerId ? Number(ownerId) : undefined,
+        page,
+        size: 20,
+      }),
   })
 
   const pageIds = data?.content.map((item) => item.id) ?? []
@@ -33,7 +41,14 @@ export function ApplicationListPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-slate-800">Uygulama & Yazılım</h1>
         <div className="flex gap-2">
-          <ExportButton path="/applications/export" params={{ vendor: vendor || undefined, expiryBefore: expiryBefore || undefined }} />
+          <ExportButton
+            path="/applications/export"
+            params={{
+              vendor: vendor || undefined,
+              expiryBefore: expiryBefore || undefined,
+              responsibilityOwnerId: ownerId || undefined,
+            }}
+          />
           {isAdmin && (
             <Link to="/applications/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
               Yeni Uygulama
@@ -65,6 +80,14 @@ export function ApplicationListPage() {
           />
         </label>
       </div>
+
+      <OwnerFilter
+        value={ownerId}
+        onChange={(value) => {
+          setPage(0)
+          setOwnerId(value)
+        }}
+      />
 
       <BulkStatusBar selection={selection} queryKey="applications" />
 

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useIsAdmin } from '../../auth/useIsAdmin'
 import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { ExportButton } from '../../components/ExportButton'
+import { OwnerFilter } from '../../components/OwnerFilter'
 import { useSelection } from '../../hooks/useSelection'
 import { formatCustomFieldValue, useListCustomFields } from '../../hooks/useListCustomFields'
 import { Pagination } from '../../components/Pagination'
@@ -13,13 +14,20 @@ import { listWorkstations } from '../../api/workstations'
 export function WorkstationListPage() {
   const isAdmin = useIsAdmin()
   const [serialNumber, setSerialNumber] = useState('')
+  const [ownerId, setOwnerId] = useState('')
   const [page, setPage] = useState(0)
   const selection = useSelection()
   const listFields = useListCustomFields('WORKSTATION')
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['workstations', { serialNumber, page }],
-    queryFn: () => listWorkstations({ serialNumber: serialNumber || undefined, page, size: 20 }),
+    queryKey: ['workstations', { serialNumber, ownerId, page }],
+    queryFn: () =>
+      listWorkstations({
+        serialNumber: serialNumber || undefined,
+        responsibilityOwnerId: ownerId ? Number(ownerId) : undefined,
+        page,
+        size: 20,
+      }),
   })
 
   const pageIds = data?.content.map((item) => item.id) ?? []
@@ -29,7 +37,13 @@ export function WorkstationListPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-slate-800">İş İstasyonları</h1>
         <div className="flex gap-2">
-          <ExportButton path="/workstations/export" params={{ serialNumber: serialNumber || undefined }} />
+          <ExportButton
+            path="/workstations/export"
+            params={{
+              serialNumber: serialNumber || undefined,
+              responsibilityOwnerId: ownerId || undefined,
+            }}
+          />
           {isAdmin && (
             <Link to="/workstations/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
               Yeni İş İstasyonu
@@ -45,6 +59,14 @@ export function WorkstationListPage() {
         onChange={(e) => {
           setPage(0)
           setSerialNumber(e.target.value)
+        }}
+      />
+
+      <OwnerFilter
+        value={ownerId}
+        onChange={(value) => {
+          setPage(0)
+          setOwnerId(value)
         }}
       />
 
