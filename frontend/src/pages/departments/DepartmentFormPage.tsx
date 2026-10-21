@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { createDepartment, getDepartment, updateDepartment } from '../../api/departments'
 import { extractErrorMessage } from '../../api/client'
+import { useIsAdmin } from '../../auth/useIsAdmin'
 import { Field } from '../../components/Field'
 import type { DepartmentRequest } from '../../types/department'
 
@@ -11,6 +12,7 @@ const EMPTY_FORM: DepartmentRequest = { name: '', code: '', active: true }
 export function DepartmentFormPage() {
   const { id } = useParams()
   const isEdit = Boolean(id)
+  const isAdmin = useIsAdmin()
   const navigate = useNavigate()
 
   const [form, setForm] = useState<DepartmentRequest>(EMPTY_FORM)
@@ -56,41 +58,44 @@ export function DepartmentFormPage() {
       <h1 className="text-xl font-semibold text-slate-800">{isEdit ? 'Departmanı Düzenle' : 'Yeni Departman'}</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-200 bg-white p-6">
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Ad" required>
-            <input
-              className="input"
-              maxLength={150}
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              required
-            />
-          </Field>
+        <fieldset disabled={!isAdmin} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Ad" required>
+              <input
+                className="input"
+                maxLength={150}
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                required
+              />
+            </Field>
 
-          <Field label="Kod" required>
-            <input
-              className="input"
-              maxLength={30}
-              value={form.code}
-              onChange={(e) => setForm({ ...form, code: e.target.value })}
-              required
-            />
-          </Field>
+            <Field label="Kod" required>
+              <input
+                className="input"
+                maxLength={30}
+                value={form.code}
+                onChange={(e) => setForm({ ...form, code: e.target.value })}
+                required
+              />
+            </Field>
 
-          <Field label="Aktif">
-            <input
-              type="checkbox"
-              checked={form.active}
-              onChange={(e) => setForm({ ...form, active: e.target.checked })}
-            />
-          </Field>
-        </div>
+            <Field label="Aktif">
+              <input
+                type="checkbox"
+                checked={form.active}
+                onChange={(e) => setForm({ ...form, active: e.target.checked })}
+              />
+            </Field>
+          </div>
+        </fieldset>
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 
         <div className="flex gap-3">
           <button
             type="submit"
+            hidden={!isAdmin}
             disabled={submitting}
             className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
           >

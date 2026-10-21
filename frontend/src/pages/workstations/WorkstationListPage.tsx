@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import { useIsAdmin } from '../../auth/useIsAdmin'
 import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { ExportButton } from '../../components/ExportButton'
 import { useSelection } from '../../hooks/useSelection'
@@ -10,6 +11,7 @@ import { ASSET_STATUS_LABELS } from '../../types/common'
 import { listWorkstations } from '../../api/workstations'
 
 export function WorkstationListPage() {
+  const isAdmin = useIsAdmin()
   const [serialNumber, setSerialNumber] = useState('')
   const [page, setPage] = useState(0)
   const selection = useSelection()
@@ -28,9 +30,11 @@ export function WorkstationListPage() {
         <h1 className="text-xl font-semibold text-slate-800">İş İstasyonları</h1>
         <div className="flex gap-2">
           <ExportButton path="/workstations/export" params={{ serialNumber: serialNumber || undefined }} />
-          <Link to="/workstations/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
-            Yeni İş İstasyonu
-          </Link>
+          {isAdmin && (
+            <Link to="/workstations/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
+              Yeni İş İstasyonu
+            </Link>
+          )}
         </div>
       </div>
 

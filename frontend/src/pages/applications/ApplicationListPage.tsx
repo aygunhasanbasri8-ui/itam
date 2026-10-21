@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useSearchParams } from 'react-router-dom'
+import { useIsAdmin } from '../../auth/useIsAdmin'
 import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { ExportButton } from '../../components/ExportButton'
 import { useSelection } from '../../hooks/useSelection'
@@ -10,6 +11,7 @@ import { ASSET_STATUS_LABELS } from '../../types/common'
 import { listApplications } from '../../api/applications'
 
 export function ApplicationListPage() {
+  const isAdmin = useIsAdmin()
   const [searchParams] = useSearchParams()
   const [vendor, setVendor] = useState('')
   // Dashboard'daki lisans kartları buraya ?expiryBefore= ile yönlendiriyor
@@ -32,9 +34,11 @@ export function ApplicationListPage() {
         <h1 className="text-xl font-semibold text-slate-800">Uygulama & Yazılım</h1>
         <div className="flex gap-2">
           <ExportButton path="/applications/export" params={{ vendor: vendor || undefined, expiryBefore: expiryBefore || undefined }} />
-          <Link to="/applications/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
-            Yeni Uygulama
-          </Link>
+          {isAdmin && (
+            <Link to="/applications/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
+              Yeni Uygulama
+            </Link>
+          )}
         </div>
       </div>
 

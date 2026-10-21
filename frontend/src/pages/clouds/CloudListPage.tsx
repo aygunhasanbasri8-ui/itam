@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import { useIsAdmin } from '../../auth/useIsAdmin'
 import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { ExportButton } from '../../components/ExportButton'
 import { useSelection } from '../../hooks/useSelection'
@@ -10,6 +11,7 @@ import { ASSET_STATUS_LABELS } from '../../types/common'
 import { listClouds } from '../../api/clouds'
 
 export function CloudListPage() {
+  const isAdmin = useIsAdmin()
   const [provider, setProvider] = useState('')
   const [page, setPage] = useState(0)
   const selection = useSelection()
@@ -28,9 +30,11 @@ export function CloudListPage() {
         <h1 className="text-xl font-semibold text-slate-800">Cloud Varlıkları</h1>
         <div className="flex gap-2">
           <ExportButton path="/cloud-assets/export" params={{ provider: provider || undefined }} />
-          <Link to="/clouds/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
-            Yeni Cloud Varlığı
-          </Link>
+          {isAdmin && (
+            <Link to="/clouds/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
+              Yeni Cloud Varlığı
+            </Link>
+          )}
         </div>
       </div>
 

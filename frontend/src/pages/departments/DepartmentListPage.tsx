@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import { useIsAdmin } from '../../auth/useIsAdmin'
 import { listDepartments } from '../../api/departments'
 import { Pagination } from '../../components/Pagination'
 
 export function DepartmentListPage() {
+  const isAdmin = useIsAdmin()
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(0)
 
@@ -17,9 +19,11 @@ export function DepartmentListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-slate-800">Departmanlar</h1>
-        <Link to="/departments/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
-          Yeni Departman
-        </Link>
+        {isAdmin && (
+          <Link to="/departments/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
+            Yeni Departman
+          </Link>
+        )}
       </div>
 
       <input
