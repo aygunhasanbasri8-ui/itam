@@ -11,7 +11,7 @@ import tr.com.nkolay.itam.model.dto.PageResponse;
 public interface BusinessServiceAssetService {
 
     PageResponse<BusinessServiceAssetResponse> list(ServiceCriticality criticality,
-            AssetStatus status, Pageable pageable);
+            AssetStatus status, Long responsibilityOwnerId, Pageable pageable);
 
     BusinessServiceAssetResponse get(Long id);
 

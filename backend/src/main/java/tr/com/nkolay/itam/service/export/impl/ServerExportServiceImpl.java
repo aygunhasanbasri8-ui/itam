@@ -20,6 +20,7 @@ import tr.com.nkolay.itam.enums.AssetStatus;
 import tr.com.nkolay.itam.enums.ServerEnvironment;
 import tr.com.nkolay.itam.model.entity.ServerAsset;
 import tr.com.nkolay.itam.repository.ServerAssetRepository;
+import tr.com.nkolay.itam.repository.spec.BaseAssetSpecifications;
 import tr.com.nkolay.itam.repository.spec.ServerAssetSpecifications;
 import tr.com.nkolay.itam.service.export.ServerExportColumn;
 import tr.com.nkolay.itam.service.export.ServerExportService;
@@ -54,7 +55,7 @@ public class ServerExportServiceImpl implements ServerExportService {
                 .and(ServerAssetSpecifications.hostnameContains(hostname))
                 .and(ServerAssetSpecifications.environmentEquals(environment))
                 .and(ServerAssetSpecifications.statusEquals(status))
-                .and(ServerAssetSpecifications.responsibilityOwnerEquals(responsibilityOwnerId));
+                .and(BaseAssetSpecifications.responsibilityOwnerEquals(responsibilityOwnerId));
 
         List<ServerAsset> servers = serverAssetRepository.findAll(spec);
 

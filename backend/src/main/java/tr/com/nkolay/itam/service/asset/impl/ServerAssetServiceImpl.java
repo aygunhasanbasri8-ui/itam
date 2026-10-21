@@ -21,6 +21,7 @@ import tr.com.nkolay.itam.model.entity.ServerAsset;
 import tr.com.nkolay.itam.repository.AssetTypeDefinitionRepository;
 import tr.com.nkolay.itam.repository.PersonRepository;
 import tr.com.nkolay.itam.repository.ServerAssetRepository;
+import tr.com.nkolay.itam.repository.spec.BaseAssetSpecifications;
 import tr.com.nkolay.itam.repository.spec.ServerAssetSpecifications;
 import tr.com.nkolay.itam.service.asset.ServerAssetService;
 import tr.com.nkolay.itam.service.customfield.CustomFieldValidator;
@@ -60,7 +61,7 @@ public class ServerAssetServiceImpl implements ServerAssetService {
                 .and(ServerAssetSpecifications.hostnameContains(hostname))
                 .and(ServerAssetSpecifications.environmentEquals(environment))
                 .and(ServerAssetSpecifications.statusEquals(status))
-                .and(ServerAssetSpecifications.responsibilityOwnerEquals(responsibilityOwnerId));
+                .and(BaseAssetSpecifications.responsibilityOwnerEquals(responsibilityOwnerId));
 
         Page<ServerAsset> page = serverAssetRepository.findAll(spec, pageable);
         return PageResponse.of(page, mapper::toResponse);

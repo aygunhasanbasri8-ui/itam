@@ -9,7 +9,8 @@ import tr.com.nkolay.itam.model.dto.ExportColumnResponse;
 
 public interface WorkstationExportService {
 
-    void writeXlsx(OutputStream out, String serialNumber, AssetStatus status, Long departmentId,
+    void writeXlsx(OutputStream out, String serialNumber, AssetStatus status, Long responsibilityOwnerId,
+            Long departmentId,
             Long assignedPersonId, List<String> columns, String requestedBy);
 
     default List<ExportColumnResponse> columns() {

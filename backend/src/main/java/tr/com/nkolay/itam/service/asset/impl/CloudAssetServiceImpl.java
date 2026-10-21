@@ -21,6 +21,7 @@ import tr.com.nkolay.itam.model.entity.Person;
 import tr.com.nkolay.itam.repository.AssetTypeDefinitionRepository;
 import tr.com.nkolay.itam.repository.CloudAssetRepository;
 import tr.com.nkolay.itam.repository.PersonRepository;
+import tr.com.nkolay.itam.repository.spec.BaseAssetSpecifications;
 import tr.com.nkolay.itam.repository.spec.CloudAssetSpecifications;
 import tr.com.nkolay.itam.service.asset.CloudAssetService;
 import tr.com.nkolay.itam.service.customfield.CustomFieldValidator;
@@ -53,12 +54,13 @@ public class CloudAssetServiceImpl implements CloudAssetService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<CloudAssetResponse> list(CloudProvider provider, String region,
-            AssetStatus status, Pageable pageable) {
+            AssetStatus status, Long responsibilityOwnerId, Pageable pageable) {
         Specification<CloudAsset> spec = Specification
                 .where(CloudAssetSpecifications.notDeleted())
                 .and(CloudAssetSpecifications.providerEquals(provider))
                 .and(CloudAssetSpecifications.regionEquals(region))
-                .and(CloudAssetSpecifications.statusEquals(status));
+                .and(CloudAssetSpecifications.statusEquals(status))
+                .and(BaseAssetSpecifications.responsibilityOwnerEquals(responsibilityOwnerId));
 
         Page<CloudAsset> page = cloudAssetRepository.findAll(spec, pageable);
         return PageResponse.of(page, mapper::toResponse);
@@ -114,7 +116,8 @@ public class CloudAssetServiceImpl implements CloudAssetService {
                             "Sistem kaydı '%s' bulunamadı, V1 migration'ı kontrol et".formatted(Person.COMPANY_CODE)));
         }
         return personRepository.findByIdAndActiveTrue(id).orElseGet(() -> {
-            errors.add("responsibilityOwnerId", "sorumluBulunamadi", "Belirtilen sorumlu kişi bulunamadı", id);
+            errors.add("responsibilityOwnerId", "sorumluBulunamadi",
+                    "Belirtilen sorumlu kişi bulunamadı", id);
             return null;
         });
     }

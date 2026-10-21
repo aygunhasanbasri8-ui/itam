@@ -22,6 +22,7 @@ import tr.com.nkolay.itam.repository.AssetTypeDefinitionRepository;
 import tr.com.nkolay.itam.repository.DepartmentRepository;
 import tr.com.nkolay.itam.repository.PersonRepository;
 import tr.com.nkolay.itam.repository.WorkstationAssetRepository;
+import tr.com.nkolay.itam.repository.spec.BaseAssetSpecifications;
 import tr.com.nkolay.itam.repository.spec.WorkstationAssetSpecifications;
 import tr.com.nkolay.itam.service.asset.WorkstationAssetService;
 import tr.com.nkolay.itam.service.customfield.CustomFieldValidator;
@@ -57,11 +58,13 @@ public class WorkstationAssetServiceImpl implements WorkstationAssetService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<WorkstationAssetResponse> list(String serialNumber, AssetStatus status,
+            Long responsibilityOwnerId,
             Long departmentId, Long assignedPersonId, Pageable pageable) {
         Specification<WorkstationAsset> spec = Specification
                 .where(WorkstationAssetSpecifications.notDeleted())
                 .and(WorkstationAssetSpecifications.serialNumberContains(serialNumber))
                 .and(WorkstationAssetSpecifications.statusEquals(status))
+                .and(BaseAssetSpecifications.responsibilityOwnerEquals(responsibilityOwnerId))
                 .and(WorkstationAssetSpecifications.departmentEquals(departmentId))
                 .and(WorkstationAssetSpecifications.assignedPersonEquals(assignedPersonId));
 

@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tr.com.nkolay.itam.enums.AssetStatus;
 import tr.com.nkolay.itam.model.entity.WorkstationAsset;
 import tr.com.nkolay.itam.repository.WorkstationAssetRepository;
+import tr.com.nkolay.itam.repository.spec.BaseAssetSpecifications;
 import tr.com.nkolay.itam.repository.spec.WorkstationAssetSpecifications;
 import tr.com.nkolay.itam.service.export.WorkstationExportColumn;
 import tr.com.nkolay.itam.service.export.WorkstationExportService;
@@ -38,7 +39,8 @@ public class WorkstationExportServiceImpl implements WorkstationExportService {
     }
 
     @Override
-    public void writeXlsx(OutputStream out, String serialNumber, AssetStatus status, Long departmentId,
+    public void writeXlsx(OutputStream out, String serialNumber, AssetStatus status,
+            Long responsibilityOwnerId, Long departmentId,
             Long assignedPersonId, List<String> columns, String requestedBy) {
         List<WorkstationExportColumn> resolvedColumns = resolveColumns(columns);
 
@@ -46,6 +48,7 @@ public class WorkstationExportServiceImpl implements WorkstationExportService {
                 .where(WorkstationAssetSpecifications.notDeleted())
                 .and(WorkstationAssetSpecifications.serialNumberContains(serialNumber))
                 .and(WorkstationAssetSpecifications.statusEquals(status))
+                .and(BaseAssetSpecifications.responsibilityOwnerEquals(responsibilityOwnerId))
                 .and(WorkstationAssetSpecifications.departmentEquals(departmentId))
                 .and(WorkstationAssetSpecifications.assignedPersonEquals(assignedPersonId));
 
@@ -54,7 +57,8 @@ public class WorkstationExportServiceImpl implements WorkstationExportService {
         SXSSFWorkbook workbook = new SXSSFWorkbook(SXSSF_WINDOW_SIZE);
         try {
             Sheet sheet = workbook.createSheet("İş İstasyonları");
-            int rowIndex = writeMetaBlock(sheet, requestedBy, serialNumber, status, departmentId, assignedPersonId);
+            int rowIndex = writeMetaBlock(sheet, requestedBy, serialNumber, status,
+                    responsibilityOwnerId, departmentId, assignedPersonId);
             rowIndex = writeHeaderRow(sheet, resolvedColumns, rowIndex);
             writeDataRows(sheet, resolvedColumns, workstations, rowIndex);
 
@@ -83,21 +87,25 @@ public class WorkstationExportServiceImpl implements WorkstationExportService {
     }
 
     private int writeMetaBlock(Sheet sheet, String requestedBy, String serialNumber, AssetStatus status,
+            Long responsibilityOwnerId,
             Long departmentId, Long assignedPersonId) {
         int rowIndex = 0;
         createTextRow(sheet, rowIndex++, "Üretim tarihi: " + OffsetDateTime.now().format(TIMESTAMP_FORMAT));
         createTextRow(sheet, rowIndex++, "Üreten kullanıcı: " + requestedBy);
         createTextRow(sheet, rowIndex++, "Uygulanan filtreler: "
-                + describeFilters(serialNumber, status, departmentId, assignedPersonId));
+                + describeFilters(serialNumber, status, responsibilityOwnerId, departmentId,
+                        assignedPersonId));
         rowIndex++;
         return rowIndex;
     }
 
-    private String describeFilters(String serialNumber, AssetStatus status, Long departmentId,
+    private String describeFilters(String serialNumber, AssetStatus status, Long responsibilityOwnerId,
+            Long departmentId,
             Long assignedPersonId) {
         List<String> parts = new ArrayList<>();
         if (serialNumber != null && !serialNumber.isBlank()) parts.add("serialNumber~" + serialNumber);
         if (status != null) parts.add("status=" + status);
+        if (responsibilityOwnerId != null) parts.add("responsibilityOwnerId=" + responsibilityOwnerId);
         if (departmentId != null) parts.add("departmentId=" + departmentId);
         if (assignedPersonId != null) parts.add("assignedPersonId=" + assignedPersonId);
         return parts.isEmpty() ? "(filtre uygulanmadı)" : String.join(", ", parts);

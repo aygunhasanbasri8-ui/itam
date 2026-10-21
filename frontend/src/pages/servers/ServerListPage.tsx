@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useIsAdmin } from '../../auth/useIsAdmin'
 import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { ExportButton } from '../../components/ExportButton'
+import { OwnerFilter } from '../../components/OwnerFilter'
 import { useSelection } from '../../hooks/useSelection'
 import { formatCustomFieldValue, useListCustomFields } from '../../hooks/useListCustomFields'
 import { Pagination } from '../../components/Pagination'
@@ -14,16 +15,18 @@ export function ServerListPage() {
   const isAdmin = useIsAdmin()
   const [hostname, setHostname] = useState('')
   const [environment, setEnvironment] = useState('')
+  const [ownerId, setOwnerId] = useState('')
   const [page, setPage] = useState(0)
   const selection = useSelection()
   const listFields = useListCustomFields('SERVER')
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['servers', { hostname, environment, page }],
+    queryKey: ['servers', { hostname, environment, ownerId, page }],
     queryFn: () =>
       listServers({
         hostname: hostname || undefined,
         environment: environment || undefined,
+        responsibilityOwnerId: ownerId ? Number(ownerId) : undefined,
         page,
         size: 20,
       }),
@@ -36,7 +39,14 @@ export function ServerListPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-slate-800">Sunucular</h1>
         <div className="flex gap-2">
-          <ExportButton path="/servers/export" params={{ hostname: hostname || undefined, environment: environment || undefined }} />
+          <ExportButton
+            path="/servers/export"
+            params={{
+              hostname: hostname || undefined,
+              environment: environment || undefined,
+              responsibilityOwnerId: ownerId || undefined,
+            }}
+          />
           {isAdmin && (
             <Link to="/servers/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
               Yeni Sunucu
@@ -70,6 +80,14 @@ export function ServerListPage() {
           <option value="PROD">PROD</option>
         </select>
       </div>
+
+      <OwnerFilter
+        value={ownerId}
+        onChange={(value) => {
+          setPage(0)
+          setOwnerId(value)
+        }}
+      />
 
       <BulkStatusBar selection={selection} queryKey="servers" />
 

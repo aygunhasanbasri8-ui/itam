@@ -20,6 +20,7 @@ import tr.com.nkolay.itam.enums.AssetStatus;
 import tr.com.nkolay.itam.enums.CloudProvider;
 import tr.com.nkolay.itam.model.entity.CloudAsset;
 import tr.com.nkolay.itam.repository.CloudAssetRepository;
+import tr.com.nkolay.itam.repository.spec.BaseAssetSpecifications;
 import tr.com.nkolay.itam.repository.spec.CloudAssetSpecifications;
 import tr.com.nkolay.itam.service.export.CloudExportColumn;
 import tr.com.nkolay.itam.service.export.CloudExportService;
@@ -40,6 +41,7 @@ public class CloudExportServiceImpl implements CloudExportService {
 
     @Override
     public void writeXlsx(OutputStream out, CloudProvider provider, String region, AssetStatus status,
+            Long responsibilityOwnerId,
             List<String> columns, String requestedBy) {
         List<CloudExportColumn> resolvedColumns = resolveColumns(columns);
 
@@ -47,14 +49,16 @@ public class CloudExportServiceImpl implements CloudExportService {
                 .where(CloudAssetSpecifications.notDeleted())
                 .and(CloudAssetSpecifications.providerEquals(provider))
                 .and(CloudAssetSpecifications.regionEquals(region))
-                .and(CloudAssetSpecifications.statusEquals(status));
+                .and(CloudAssetSpecifications.statusEquals(status))
+                .and(BaseAssetSpecifications.responsibilityOwnerEquals(responsibilityOwnerId));
 
         List<CloudAsset> clouds = cloudAssetRepository.findAll(spec);
 
         SXSSFWorkbook workbook = new SXSSFWorkbook(SXSSF_WINDOW_SIZE);
         try {
             Sheet sheet = workbook.createSheet("Cloud Varlıkları");
-            int rowIndex = writeMetaBlock(sheet, requestedBy, provider, region, status);
+            int rowIndex = writeMetaBlock(sheet, requestedBy, provider, region, status,
+                    responsibilityOwnerId);
             rowIndex = writeHeaderRow(sheet, resolvedColumns, rowIndex);
             writeDataRows(sheet, resolvedColumns, clouds, rowIndex);
 
@@ -83,20 +87,23 @@ public class CloudExportServiceImpl implements CloudExportService {
     }
 
     private int writeMetaBlock(Sheet sheet, String requestedBy, CloudProvider provider, String region,
-            AssetStatus status) {
+            AssetStatus status, Long responsibilityOwnerId) {
         int rowIndex = 0;
         createTextRow(sheet, rowIndex++, "Üretim tarihi: " + OffsetDateTime.now().format(TIMESTAMP_FORMAT));
         createTextRow(sheet, rowIndex++, "Üreten kullanıcı: " + requestedBy);
-        createTextRow(sheet, rowIndex++, "Uygulanan filtreler: " + describeFilters(provider, region, status));
+        createTextRow(sheet, rowIndex++, "Uygulanan filtreler: " + describeFilters(provider, region,
+                status, responsibilityOwnerId));
         rowIndex++;
         return rowIndex;
     }
 
-    private String describeFilters(CloudProvider provider, String region, AssetStatus status) {
+    private String describeFilters(CloudProvider provider, String region, AssetStatus status,
+            Long responsibilityOwnerId) {
         List<String> parts = new ArrayList<>();
         if (provider != null) parts.add("provider=" + provider);
         if (region != null && !region.isBlank()) parts.add("region=" + region);
         if (status != null) parts.add("status=" + status);
+        if (responsibilityOwnerId != null) parts.add("responsibilityOwnerId=" + responsibilityOwnerId);
         return parts.isEmpty() ? "(filtre uygulanmadı)" : String.join(", ", parts);
     }
 

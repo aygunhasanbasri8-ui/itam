@@ -51,9 +51,10 @@ public class ApplicationAssetController {
     public PageResponse<ApplicationAssetResponse> list(
             @RequestParam(required = false) String vendor,
             @RequestParam(required = false) AssetStatus status,
+            @RequestParam(required = false) Long responsibilityOwnerId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expiryBefore,
             @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        return applicationAssetService.list(vendor, status, expiryBefore, pageable);
+        return applicationAssetService.list(vendor, status, responsibilityOwnerId, expiryBefore, pageable);
     }
 
     @GetMapping("/{id}")
@@ -83,11 +84,13 @@ public class ApplicationAssetController {
     public ResponseEntity<byte[]> export(
             @RequestParam(required = false) String vendor,
             @RequestParam(required = false) AssetStatus status,
+            @RequestParam(required = false) Long responsibilityOwnerId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expiryBefore,
             @RequestParam(required = false) List<String> columns,
             Authentication authentication) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        applicationExportService.writeXlsx(out, vendor, status, expiryBefore, columns, authentication.getName());
+        applicationExportService.writeXlsx(out, vendor, status, responsibilityOwnerId, expiryBefore,
+                columns, authentication.getName());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=uygulama-yazilim.xlsx")

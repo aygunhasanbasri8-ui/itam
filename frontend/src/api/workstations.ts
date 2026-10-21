@@ -5,6 +5,7 @@ import type { WorkstationAssetRequest, WorkstationAssetResponse } from '../types
 export interface WorkstationListParams {
   page?: number
   size?: number
+  responsibilityOwnerId?: number
   serialNumber?: string
   status?: string
   departmentId?: number

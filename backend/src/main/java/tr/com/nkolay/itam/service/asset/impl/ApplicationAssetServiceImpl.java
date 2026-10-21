@@ -21,6 +21,7 @@ import tr.com.nkolay.itam.model.entity.Person;
 import tr.com.nkolay.itam.repository.ApplicationAssetRepository;
 import tr.com.nkolay.itam.repository.AssetTypeDefinitionRepository;
 import tr.com.nkolay.itam.repository.PersonRepository;
+import tr.com.nkolay.itam.repository.spec.BaseAssetSpecifications;
 import tr.com.nkolay.itam.repository.spec.ApplicationAssetSpecifications;
 import tr.com.nkolay.itam.service.asset.ApplicationAssetService;
 import tr.com.nkolay.itam.service.customfield.CustomFieldValidator;
@@ -53,11 +54,13 @@ public class ApplicationAssetServiceImpl implements ApplicationAssetService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<ApplicationAssetResponse> list(String vendor, AssetStatus status,
+            Long responsibilityOwnerId,
             LocalDate expiryBefore, Pageable pageable) {
         Specification<ApplicationAsset> spec = Specification
                 .where(ApplicationAssetSpecifications.notDeleted())
                 .and(ApplicationAssetSpecifications.vendorContains(vendor))
                 .and(ApplicationAssetSpecifications.statusEquals(status))
+                .and(BaseAssetSpecifications.responsibilityOwnerEquals(responsibilityOwnerId))
                 .and(ApplicationAssetSpecifications.expiryBefore(expiryBefore));
 
         Page<ApplicationAsset> page = applicationAssetRepository.findAll(spec, pageable);
@@ -116,7 +119,8 @@ public class ApplicationAssetServiceImpl implements ApplicationAssetService {
                             "Sistem kaydı '%s' bulunamadı, V1 migration'ı kontrol et".formatted(Person.COMPANY_CODE)));
         }
         return personRepository.findByIdAndActiveTrue(id).orElseGet(() -> {
-            errors.add("responsibilityOwnerId", "sorumluBulunamadi", "Belirtilen sorumlu kişi bulunamadı", id);
+            errors.add("responsibilityOwnerId", "sorumluBulunamadi",
+                    "Belirtilen sorumlu kişi bulunamadı", id);
             return null;
         });
     }

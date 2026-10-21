@@ -5,6 +5,7 @@ import type { ApplicationAssetRequest, ApplicationAssetResponse } from '../types
 export interface ApplicationListParams {
   page?: number
   size?: number
+  responsibilityOwnerId?: number
   vendor?: string
   status?: string
   expiryBefore?: string

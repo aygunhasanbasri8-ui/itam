@@ -10,7 +10,8 @@ import tr.com.nkolay.itam.model.dto.ExportColumnResponse;
 
 public interface ApplicationExportService {
 
-    void writeXlsx(OutputStream out, String vendor, AssetStatus status, LocalDate expiryBefore,
+    void writeXlsx(OutputStream out, String vendor, AssetStatus status, Long responsibilityOwnerId,
+            LocalDate expiryBefore,
             List<String> columns, String requestedBy);
 
     default List<ExportColumnResponse> columns() {

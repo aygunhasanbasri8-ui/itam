@@ -10,6 +10,7 @@ import tr.com.nkolay.itam.model.dto.WorkstationAssetResponse;
 public interface WorkstationAssetService {
 
     PageResponse<WorkstationAssetResponse> list(String serialNumber, AssetStatus status,
+            Long responsibilityOwnerId,
             Long departmentId, Long assignedPersonId, Pageable pageable);
 
     WorkstationAssetResponse get(Long id);
