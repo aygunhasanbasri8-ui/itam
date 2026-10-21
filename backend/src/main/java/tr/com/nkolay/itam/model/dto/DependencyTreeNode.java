@@ -14,6 +14,7 @@ import tr.com.nkolay.itam.enums.DependencyType;
 public record DependencyTreeNode(
         Long assetId,
         String assetName,
+        String assetTypeCode,
         DependencyType dependencyType,
         List<DependencyTreeNode> children) {
 }

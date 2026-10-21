@@ -105,11 +105,11 @@ public class AssetDependencyServiceImpl implements AssetDependencyService {
                 new HashSet<>(), assetIds);
         assetIds.add(rootAssetId);
 
-        Map<Long, String> namesById = new HashMap<>();
+        Map<Long, BaseAsset> assetsById = new HashMap<>();
         baseAssetRepository.findAllById(assetIds)
-                .forEach(asset -> namesById.put(asset.getId(), asset.getAssetName()));
+                .forEach(asset -> assetsById.put(asset.getId(), asset));
 
-        return withNames(idOnlyTree, namesById);
+        return withDetails(idOnlyTree, assetsById);
     }
 
     /** Döngüye düşmemek için ziyaret edilen asset'leri izler; kaçak bir döngü varsa orada durur. */
@@ -117,7 +117,7 @@ public class AssetDependencyServiceImpl implements AssetDependencyService {
             Map<Long, List<AssetDependency>> childrenByParentId, Set<Long> visited, Set<Long> collected) {
         collected.add(assetId);
         if (!visited.add(assetId)) {
-            return new DependencyTreeNode(assetId, null, incomingType, List.of());
+            return new DependencyTreeNode(assetId, null, null, incomingType, List.of());
         }
 
         List<DependencyTreeNode> children = childrenByParentId
@@ -126,15 +126,18 @@ public class AssetDependencyServiceImpl implements AssetDependencyService {
                         childrenByParentId, visited, collected))
                 .toList();
 
-        return new DependencyTreeNode(assetId, null, incomingType, children);
+        return new DependencyTreeNode(assetId, null, null, incomingType, children);
     }
 
-    private DependencyTreeNode withNames(DependencyTreeNode node, Map<Long, String> namesById) {
-        String name = namesById.get(node.assetId());
+    private DependencyTreeNode withDetails(DependencyTreeNode node, Map<Long, BaseAsset> assetsById) {
+        BaseAsset asset = assetsById.get(node.assetId());
         List<DependencyTreeNode> children = node.children().stream()
-                .map(child -> withNames(child, namesById))
+                .map(child -> withDetails(child, assetsById))
                 .toList();
-        return new DependencyTreeNode(node.assetId(), name, node.dependencyType(), children);
+        return new DependencyTreeNode(node.assetId(),
+                asset == null ? null : asset.getAssetName(),
+                asset == null ? null : asset.getAssetType().getCode(),
+                node.dependencyType(), children);
     }
 
     /** parentId -> childId kenarı eklendiğinde, childId'den parentId'ye zaten bir yol varsa döngü oluşur. */
