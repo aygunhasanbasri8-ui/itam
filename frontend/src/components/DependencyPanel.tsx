@@ -1,9 +1,11 @@
 import { useState, type FormEvent } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createDependency, deleteDependency, getDependencyTree, listAssetDependencies } from '../api/dependencies'
-import { listAllAssetOptions } from '../api/allAssets'
+import { searchAssets } from '../api/assetSearch'
+import { useDebouncedValue } from '../hooks/useDebouncedValue'
 import { extractErrorMessage } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
+import { ASSET_TYPE_LABELS } from '../types/assetType'
 import type { DependencyTreeNode, DependencyType } from '../types/dependency'
 
 const DEPENDENCY_TYPE_LABELS: Record<DependencyType, string> = {
@@ -147,12 +149,13 @@ function AddDependencyForm({ assetId, onAdded }: { assetId: number; onAdded: () 
   const [notes, setNotes] = useState('')
   const [error, setError] = useState<string | null>(null)
 
-  const { data: options } = useQuery({ queryKey: ['all-asset-options'], queryFn: listAllAssetOptions })
-
-  const term = search.trim().toLocaleLowerCase('tr')
-  const candidates = (options ?? [])
-    .filter((option) => option.id !== assetId)
-    .filter((option) => !term || option.assetName.toLocaleLowerCase('tr').includes(term))
+  // Her tuşta istek atmasın diye yazma bitince aranıyor
+  const term = useDebouncedValue(search.trim())
+  const { data: results } = useQuery({
+    queryKey: ['asset-search', term],
+    queryFn: () => searchAssets(term),
+  })
+  const candidates = (results ?? []).filter((option) => option.id !== assetId)
 
   const mutation = useMutation({
     mutationFn: createDependency,
@@ -201,7 +204,7 @@ function AddDependencyForm({ assetId, onAdded }: { assetId: number; onAdded: () 
         </select>
         <input
           className="input"
-          placeholder="Varlık adına göre süz..."
+          placeholder="Varlık adıyla ara..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -209,7 +212,7 @@ function AddDependencyForm({ assetId, onAdded }: { assetId: number; onAdded: () 
           <option value="">Varlık seçin ({candidates.length})</option>
           {candidates.map((option) => (
             <option key={option.id} value={option.id}>
-              {option.assetName} — {option.typeLabel}
+              {option.assetName} — {ASSET_TYPE_LABELS[option.assetTypeCode]}
             </option>
           ))}
         </select>
