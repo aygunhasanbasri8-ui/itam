@@ -2,9 +2,12 @@ package tr.com.nkolay.itam.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import tr.com.nkolay.itam.model.entity.BaseAsset;
@@ -15,7 +18,8 @@ import tr.com.nkolay.itam.model.entity.BaseAsset;
  * bakmadan BaseAsset üzerinden çalışmak, her tip için ayrı kod yazmaktan
  * kurtarıyor (JOINED kalıtım sayesinde tek sorguyla hepsi gelir).
  */
-public interface BaseAssetRepository extends JpaRepository<BaseAsset, Long> {
+public interface BaseAssetRepository
+        extends JpaRepository<BaseAsset, Long>, JpaSpecificationExecutor<BaseAsset> {
 
     long countByDeletedFalse();
 
@@ -27,10 +31,15 @@ public interface BaseAssetRepository extends JpaRepository<BaseAsset, Long> {
     @Query("select b.assetType.code, count(b) from BaseAsset b where b.deleted = false group by b.assetType.code")
     List<Object[]> countByAssetTypeGrouped();
 
-    @EntityGraph(attributePaths = "assetType")
+    @EntityGraph(attributePaths = { "assetType", "responsibilityOwner" })
     List<BaseAsset> findByDeletedFalseAndAssetNameContainingIgnoreCaseOrderByAssetName(String assetName,
             Pageable pageable);
 
-    @EntityGraph(attributePaths = "assetType")
+    @EntityGraph(attributePaths = { "assetType", "responsibilityOwner" })
     List<BaseAsset> findTop5ByDeletedFalseOrderByCreatedAtDesc();
+
+    // Tüm tipler listesinde tip adı ve sorumlu her satırda gösteriliyor; N+1 olmasın
+    @Override
+    @EntityGraph(attributePaths = { "assetType", "responsibilityOwner" })
+    Page<BaseAsset> findAll(Specification<BaseAsset> spec, Pageable pageable);
 }
