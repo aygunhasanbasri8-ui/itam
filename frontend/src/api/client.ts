@@ -26,12 +26,14 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
-// 401 her zaman oturumun düştüğü anlamına gelir (token süresi doldu/geçersiz);
+// 401 oturumun düştüğü anlamına gelir (token süresi doldu/geçersiz/kullanıcı pasif);
 // kullanıcıyı otomatik login'e atmak, her ekranda ayrı ayrı bunu ele almaktan kurtarır.
+// Login isteğinin kendi 401'i hariç: o "şifre yanlış" demek, sayfa yenilenirse mesaj kaybolur.
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const isLoginRequest = error.config?.url === '/auth/login'
+    if (error.response?.status === 401 && !isLoginRequest) {
       clearToken()
       window.location.href = '/login'
     }
