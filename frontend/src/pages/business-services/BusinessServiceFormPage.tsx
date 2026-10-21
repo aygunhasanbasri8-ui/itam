@@ -5,6 +5,8 @@ import { createBusinessService, getBusinessService, updateBusinessService } from
 import { listActivePeople } from '../../api/people'
 import { extractErrorMessage } from '../../api/client'
 import { Field } from '../../components/Field'
+import { DependencyPanel } from '../../components/DependencyPanel'
+import { AuditTrailPanel } from '../../components/AuditTrailPanel'
 import type { BusinessServiceAssetRequest, ServiceCriticality } from '../../types/businessService'
 
 const EMPTY_FORM: BusinessServiceAssetRequest = { assetName: '' }
@@ -155,6 +157,13 @@ export function BusinessServiceFormPage() {
           </button>
         </div>
       </form>
+
+      {isEdit && (
+        <>
+          <DependencyPanel assetId={Number(id)} />
+          <AuditTrailPanel assetId={Number(id)} />
+        </>
+      )}
     </div>
   )
 }

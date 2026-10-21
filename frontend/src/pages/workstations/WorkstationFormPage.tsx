@@ -7,6 +7,8 @@ import { listActiveDepartments } from '../../api/departments'
 import { extractErrorMessage } from '../../api/client'
 import type { WorkstationAssetRequest } from '../../types/workstation'
 import { Field } from '../../components/Field'
+import { DependencyPanel } from '../../components/DependencyPanel'
+import { AuditTrailPanel } from '../../components/AuditTrailPanel'
 
 const EMPTY_FORM: WorkstationAssetRequest = { assetName: '', serialNumber: '', notes: '' }
 
@@ -194,6 +196,13 @@ export function WorkstationFormPage() {
           </button>
         </div>
       </form>
+
+      {isEdit && (
+        <>
+          <DependencyPanel assetId={Number(id)} />
+          <AuditTrailPanel assetId={Number(id)} />
+        </>
+      )}
     </div>
   )
 }
