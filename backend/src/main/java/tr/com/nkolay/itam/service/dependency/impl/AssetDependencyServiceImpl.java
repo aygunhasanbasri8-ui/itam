@@ -1,6 +1,5 @@
 package tr.com.nkolay.itam.service.dependency.impl;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -93,12 +92,7 @@ public class AssetDependencyServiceImpl implements AssetDependencyService {
             throw new ResourceNotFoundException("Asset", rootAssetId);
         }
 
-        Map<Long, List<AssetDependency>> childrenByParentId = new HashMap<>();
-        for (AssetDependency edge : dependencyRepository.findAll()) {
-            childrenByParentId
-                    .computeIfAbsent(edge.getParentAsset().getId(), key -> new ArrayList<>())
-                    .add(edge);
-        }
+        Map<Long, List<AssetDependency>> childrenByParentId = loadReachableEdges(rootAssetId);
 
         Set<Long> assetIds = new HashSet<>();
         DependencyTreeNode idOnlyTree = buildNode(rootAssetId, null, childrenByParentId,
@@ -142,27 +136,38 @@ public class AssetDependencyServiceImpl implements AssetDependencyService {
 
     /** parentId -> childId kenarı eklendiğinde, childId'den parentId'ye zaten bir yol varsa döngü oluşur. */
     private boolean wouldCreateCycle(Long parentId, Long childId) {
-        Map<Long, List<Long>> forward = new HashMap<>();
-        for (AssetDependency edge : dependencyRepository.findAll()) {
-            forward.computeIfAbsent(edge.getParentAsset().getId(), key -> new ArrayList<>())
-                    .add(edge.getChildAsset().getId());
+        if (parentId.equals(childId)) {
+            return true;
         }
+        return loadReachableEdges(childId).values().stream()
+                .flatMap(List::stream)
+                .anyMatch(edge -> edge.getChildAsset().getId().equals(parentId));
+    }
 
-        Set<Long> visited = new HashSet<>();
-        ArrayDeque<Long> queue = new ArrayDeque<>();
-        queue.add(childId);
+    /**
+     * Kökten ulaşılabilen kenarları seviye seviye çeker: her seviye için
+     * ix_dependency_parent indeksini kullanan tek bir sorgu. Eskiden tüm tablo
+     * okunuyordu; envanter büyüdükçe her ağaç isteği bütün kenarları taşıyordu.
+     */
+    private Map<Long, List<AssetDependency>> loadReachableEdges(Long rootAssetId) {
+        Map<Long, List<AssetDependency>> childrenByParentId = new HashMap<>();
+        Set<Long> visited = new HashSet<>(Set.of(rootAssetId));
+        Set<Long> frontier = Set.of(rootAssetId);
 
-        while (!queue.isEmpty()) {
-            Long current = queue.poll();
-            if (current.equals(parentId)) {
-                return true;
+        while (!frontier.isEmpty()) {
+            Set<Long> next = new HashSet<>();
+            for (AssetDependency edge : dependencyRepository.findByParentAssetIdIn(frontier)) {
+                childrenByParentId
+                        .computeIfAbsent(edge.getParentAsset().getId(), key -> new ArrayList<>())
+                        .add(edge);
+                Long childId = edge.getChildAsset().getId();
+                if (visited.add(childId)) {
+                    next.add(childId);
+                }
             }
-            if (!visited.add(current)) {
-                continue;
-            }
-            queue.addAll(forward.getOrDefault(current, List.of()));
+            frontier = next;
         }
-        return false;
+        return childrenByParentId;
     }
 
     private BaseAsset resolveAsset(Long id, String field, ValidationCollector errors) {

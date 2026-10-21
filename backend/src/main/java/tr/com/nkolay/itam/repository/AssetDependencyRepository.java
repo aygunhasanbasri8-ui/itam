@@ -1,5 +1,6 @@
 package tr.com.nkolay.itam.repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,6 @@ public interface AssetDependencyRepository extends JpaRepository<AssetDependency
             + "join fetch d.parentAsset join fetch d.childAsset "
             + "where d.parentAsset.id = :assetId or d.childAsset.id = :assetId")
     List<AssetDependency> findEdgesTouchingAsset(@Param("assetId") Long assetId);
+
+    List<AssetDependency> findByParentAssetIdIn(Collection<Long> parentAssetIds);
 }
