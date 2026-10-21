@@ -1,13 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { getDashboardSummary } from '../api/dashboard'
-
-const ASSET_TYPE_LABELS: Record<string, string> = {
-  SERVER: 'Sunucu',
-  WORKSTATION: 'İş İstasyonu',
-  CLOUD: 'Cloud Varlığı',
-  APPLICATION: 'Uygulama & Yazılım',
-  BUSINESS_SERVICE: 'İş Servisi',
-}
+import { ASSET_TYPE_LABELS } from '../types/assetType'
 
 const STATUS_LABELS: Record<string, string> = {
   ACTIVE: 'Aktif',
