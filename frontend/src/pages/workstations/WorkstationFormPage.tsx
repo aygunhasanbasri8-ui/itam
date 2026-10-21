@@ -7,6 +7,7 @@ import { listActiveDepartments } from '../../api/departments'
 import { extractErrorMessage } from '../../api/client'
 import type { WorkstationAssetRequest } from '../../types/workstation'
 import { Field } from '../../components/Field'
+import { CustomFieldInputs } from '../../components/CustomFieldInputs'
 import { DependencyPanel } from '../../components/DependencyPanel'
 import { AuditTrailPanel } from '../../components/AuditTrailPanel'
 
@@ -176,6 +177,12 @@ export function WorkstationFormPage() {
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
           />
         </Field>
+
+        <CustomFieldInputs
+          assetTypeCode="WORKSTATION"
+          values={form.customFields}
+          onChange={(customFields) => setForm({ ...form, customFields })}
+        />
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 

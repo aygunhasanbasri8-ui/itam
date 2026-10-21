@@ -5,6 +5,7 @@ import { createCloud, getCloud, updateCloud } from '../../api/clouds'
 import { listActivePeople } from '../../api/people'
 import { extractErrorMessage } from '../../api/client'
 import { Field } from '../../components/Field'
+import { CustomFieldInputs } from '../../components/CustomFieldInputs'
 import { DependencyPanel } from '../../components/DependencyPanel'
 import { AuditTrailPanel } from '../../components/AuditTrailPanel'
 import type { CloudAssetRequest, CloudProvider } from '../../types/cloud'
@@ -139,6 +140,12 @@ export function CloudFormPage() {
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
           />
         </Field>
+
+        <CustomFieldInputs
+          assetTypeCode="CLOUD"
+          values={form.customFields}
+          onChange={(customFields) => setForm({ ...form, customFields })}
+        />
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 

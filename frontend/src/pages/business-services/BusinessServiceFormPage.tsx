@@ -5,6 +5,7 @@ import { createBusinessService, getBusinessService, updateBusinessService } from
 import { listActivePeople } from '../../api/people'
 import { extractErrorMessage } from '../../api/client'
 import { Field } from '../../components/Field'
+import { CustomFieldInputs } from '../../components/CustomFieldInputs'
 import { DependencyPanel } from '../../components/DependencyPanel'
 import { AuditTrailPanel } from '../../components/AuditTrailPanel'
 import type { BusinessServiceAssetRequest, ServiceCriticality } from '../../types/businessService'
@@ -137,6 +138,12 @@ export function BusinessServiceFormPage() {
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
           />
         </Field>
+
+        <CustomFieldInputs
+          assetTypeCode="BUSINESS_SERVICE"
+          values={form.customFields}
+          onChange={(customFields) => setForm({ ...form, customFields })}
+        />
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 
