@@ -19,3 +19,13 @@ export async function downloadExport(path: string, params: Record<string, string
   link.click()
   URL.revokeObjectURL(url)
 }
+
+export interface ExportColumn {
+  code: string
+  header: string
+}
+
+export async function listExportColumns(exportPath: string): Promise<ExportColumn[]> {
+  const response = await apiClient.get<ExportColumn[]>(`${exportPath}/columns`)
+  return response.data
+}
