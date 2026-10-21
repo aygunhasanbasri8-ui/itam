@@ -2,6 +2,16 @@ import { useQuery } from '@tanstack/react-query'
 import { getDashboardSummary } from '../api/dashboard'
 import { ASSET_TYPE_LABELS } from '../types/assetType'
 import { ASSET_STATUS_LABELS } from '../types/common'
+import { Link } from 'react-router-dom'
+
+// toISOString UTC'ye çevirdiği için gece yarısına yakın saatlerde bir gün kayabiliyor; yerel tarihi elle kuruyoruz
+function isoDateAfterDays(days: number): string {
+  const date = new Date()
+  date.setDate(date.getDate() + days)
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${date.getFullYear()}-${month}-${day}`
+}
 
 function StatCard({ label, value, accent }: { label: string; value: number | string; accent?: string }) {
   return (
@@ -53,16 +63,20 @@ export function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard label="Toplam Asset" value={data.totalAssets} />
-        <StatCard
-          label="Süresi Yaklaşan Lisanslar (30 gün)"
-          value={data.licensesExpiringSoon}
-          accent={data.licensesExpiringSoon > 0 ? 'text-amber-600' : undefined}
-        />
-        <StatCard
-          label="Süresi Geçmiş Lisanslar"
-          value={data.licensesExpired}
-          accent={data.licensesExpired > 0 ? 'text-red-600' : undefined}
-        />
+        <Link to={`/applications?expiryBefore=${isoDateAfterDays(30)}`}>
+          <StatCard
+            label="Süresi Yaklaşan Lisanslar (30 gün)"
+            value={data.licensesExpiringSoon}
+            accent={data.licensesExpiringSoon > 0 ? 'text-amber-600' : undefined}
+          />
+        </Link>
+        <Link to={`/applications?expiryBefore=${isoDateAfterDays(0)}`}>
+          <StatCard
+            label="Süresi Geçmiş Lisanslar"
+            value={data.licensesExpired}
+            accent={data.licensesExpired > 0 ? 'text-red-600' : undefined}
+          />
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

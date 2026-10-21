@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { ExportButton } from '../../components/ExportButton'
 import { useSelection } from '../../hooks/useSelection'
@@ -10,14 +10,18 @@ import { ASSET_STATUS_LABELS } from '../../types/common'
 import { listApplications } from '../../api/applications'
 
 export function ApplicationListPage() {
+  const [searchParams] = useSearchParams()
   const [vendor, setVendor] = useState('')
+  // Dashboard'daki lisans kartları buraya ?expiryBefore= ile yönlendiriyor
+  const [expiryBefore, setExpiryBefore] = useState(searchParams.get('expiryBefore') ?? '')
   const [page, setPage] = useState(0)
   const selection = useSelection()
   const listFields = useListCustomFields('APPLICATION')
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['applications', { vendor, page }],
-    queryFn: () => listApplications({ vendor: vendor || undefined, page, size: 20 }),
+    queryKey: ['applications', { vendor, expiryBefore, page }],
+    queryFn: () =>
+      listApplications({ vendor: vendor || undefined, expiryBefore: expiryBefore || undefined, page, size: 20 }),
   })
 
   const pageIds = data?.content.map((item) => item.id) ?? []
@@ -27,22 +31,36 @@ export function ApplicationListPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-slate-800">Uygulama & Yazılım</h1>
         <div className="flex gap-2">
-          <ExportButton path="/applications/export" params={{ vendor: vendor || undefined }} />
+          <ExportButton path="/applications/export" params={{ vendor: vendor || undefined, expiryBefore: expiryBefore || undefined }} />
           <Link to="/applications/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
             Yeni Uygulama
           </Link>
         </div>
       </div>
 
-      <input
-        placeholder="Üretici ara..."
-        className="input max-w-xs"
-        value={vendor}
-        onChange={(e) => {
-          setPage(0)
-          setVendor(e.target.value)
-        }}
-      />
+      <div className="flex items-center gap-3">
+        <input
+          placeholder="Üretici ara..."
+          className="input max-w-xs"
+          value={vendor}
+          onChange={(e) => {
+            setPage(0)
+            setVendor(e.target.value)
+          }}
+        />
+        <label className="flex items-center gap-2 text-sm text-slate-600">
+          Lisansı şu tarihten önce bitenler
+          <input
+            type="date"
+            className="rounded border border-slate-300 px-3 py-2 text-sm"
+            value={expiryBefore}
+            onChange={(e) => {
+              setPage(0)
+              setExpiryBefore(e.target.value)
+            }}
+          />
+        </label>
+      </div>
 
       <BulkStatusBar selection={selection} queryKey="applications" />
 
