@@ -5,6 +5,7 @@ import { RequireAuth } from './auth/RequireAuth'
 import { AppLayout } from './layout/AppLayout'
 import { LoginPage } from './pages/LoginPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { AllAssetsPage } from './pages/assets/AllAssetsPage'
 import { ServerListPage } from './pages/servers/ServerListPage'
 import { ServerFormPage } from './pages/servers/ServerFormPage'
 import { WorkstationListPage } from './pages/workstations/WorkstationListPage'
@@ -41,6 +42,7 @@ export default function App() {
               }
             >
               <Route path="/" element={<DashboardPage />} />
+              <Route path="/assets" element={<AllAssetsPage />} />
               <Route path="/servers" element={<ServerListPage />} />
               <Route path="/servers/new" element={<ServerFormPage />} />
               <Route path="/servers/:id" element={<ServerFormPage />} />
