@@ -5,14 +5,12 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import tr.com.nkolay.itam.model.entity.ItamRevisionEntity;
+import tr.com.nkolay.itam.security.CurrentUser;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Her revizyon kaydına kullanıcı ve IP bilgisini yazar.
- * <p>
- * Faz 4'te kimlik doğrulama devreye girdiğinde kullanıcı adı
- * SecurityContextHolder'dan alınacaktır; şu an sabit değer yazılıyor.
  * <p>
  * <b>Bu sınıf Spring bean DEĞİLDİR</b> — Envers tarafından örneklenir, container'dan
  * geçmez. Bu yüzden bağımlılık enjeksiyonu yerine statik erişim kullanılıyor.
@@ -23,7 +21,7 @@ public class ItamRevisionListener implements RevisionListener {
 	@Override
 	public void newRevision(Object revisionEntity) {
 		ItamRevisionEntity revision = (ItamRevisionEntity) revisionEntity;
-		revision.setUsername("system");
+		revision.setUsername(CurrentUser.usernameOrSystem());
 		revision.setIpAddress(currentIp());
 	}
 

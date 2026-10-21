@@ -10,22 +10,16 @@ import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-/**
- * created_by / updated_by alanlarını dolduran yapılandırma.
- * <p>
- * Faz 4'te kimlik doğrulama devreye girdiğinde auditorAware,
- * SecurityContextHolder üzerinden oturum açan kullanıcıyı dönecek şekilde
- * değiştirilecektir. Şu an sabit değer dönüyor.
- */
+import tr.com.nkolay.itam.security.CurrentUser;
+
+/** created_by / updated_by alanlarını oturumdaki kullanıcıyla dolduran yapılandırma. */
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorAware", dateTimeProviderRef = "auditDateTimeProvider")
 public class JpaAuditingConfig {
 
-    public static final String SYSTEM_USER = "system";
-
     @Bean
     public AuditorAware<String> auditorAware() {
-        return () -> Optional.of(SYSTEM_USER);
+        return () -> Optional.of(CurrentUser.usernameOrSystem());
     }
 
     @Bean
