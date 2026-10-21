@@ -1,11 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 import { createDependency, deleteDependency, getDependencyTree, listAssetDependencies } from '../api/dependencies'
 import { searchAssets } from '../api/assetSearch'
 import { useDebouncedValue } from '../hooks/useDebouncedValue'
 import { extractErrorMessage } from '../api/client'
 import { useIsAdmin } from '../auth/useIsAdmin'
-import { ASSET_TYPE_LABELS } from '../types/assetType'
+import { ASSET_TYPE_LABELS, ASSET_TYPE_ROUTES, type AssetTypeCode } from '../types/assetType'
 import type { DependencyTreeNode, DependencyType } from '../types/dependency'
 
 const DEPENDENCY_TYPE_LABELS: Record<DependencyType, string> = {
@@ -60,6 +61,8 @@ export function DependencyPanel({ assetId }: { assetId: number }) {
           items={outgoing.map((edge) => ({
             id: edge.id,
             name: edge.childAssetName,
+            assetId: edge.childAssetId,
+            typeCode: edge.childAssetTypeCode,
             type: edge.dependencyType,
             notes: edge.notes,
           }))}
@@ -71,6 +74,8 @@ export function DependencyPanel({ assetId }: { assetId: number }) {
           items={incoming.map((edge) => ({
             id: edge.id,
             name: edge.parentAssetName,
+            assetId: edge.parentAssetId,
+            typeCode: edge.parentAssetTypeCode,
             type: edge.dependencyType,
             notes: edge.notes,
           }))}
@@ -94,6 +99,8 @@ export function DependencyPanel({ assetId }: { assetId: number }) {
 interface EdgeItem {
   id: number
   name: string
+  assetId: number
+  typeCode: AssetTypeCode
   type: DependencyType
   notes: string | null
 }
@@ -119,7 +126,7 @@ function EdgeList({
           {items.map((item) => (
             <li key={item.id} className="flex items-center justify-between gap-2 px-3 py-2">
               <div>
-                <span className="font-medium text-slate-700">{item.name}</span>
+                <AssetLink assetId={item.assetId} typeCode={item.typeCode} name={item.name} />
                 <span className="ml-2 text-xs text-slate-500">{DEPENDENCY_TYPE_LABELS[item.type]}</span>
                 {item.notes && <p className="text-xs text-slate-400">{item.notes}</p>}
               </div>
@@ -238,7 +245,7 @@ function AddDependencyForm({ assetId, onAdded }: { assetId: number; onAdded: () 
 function TreeNode({ node }: { node: DependencyTreeNode }) {
   return (
     <div>
-      <span className="text-slate-700">{node.assetName}</span>
+      <AssetLink assetId={node.assetId} typeCode={node.assetTypeCode} name={node.assetName} />
       {node.dependencyType && (
         <span className="ml-2 text-xs text-slate-400">({DEPENDENCY_TYPE_LABELS[node.dependencyType]})</span>
       )}
@@ -250,5 +257,13 @@ function TreeNode({ node }: { node: DependencyTreeNode }) {
         </div>
       )}
     </div>
+  )
+}
+
+function AssetLink({ assetId, typeCode, name }: { assetId: number; typeCode: AssetTypeCode; name: string }) {
+  return (
+    <Link to={`${ASSET_TYPE_ROUTES[typeCode]}/${assetId}`} className="font-medium text-slate-700 hover:underline">
+      {name}
+    </Link>
   )
 }
