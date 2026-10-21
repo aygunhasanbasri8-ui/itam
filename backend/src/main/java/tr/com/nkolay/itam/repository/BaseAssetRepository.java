@@ -2,6 +2,8 @@ package tr.com.nkolay.itam.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -24,4 +26,8 @@ public interface BaseAssetRepository extends JpaRepository<BaseAsset, Long> {
     /** Dashboard özet ekranı için asset tipi bazlı dağılım; her satır [assetTypeCode, count]. */
     @Query("select b.assetType.code, count(b) from BaseAsset b where b.deleted = false group by b.assetType.code")
     List<Object[]> countByAssetTypeGrouped();
+
+    @EntityGraph(attributePaths = "assetType")
+    List<BaseAsset> findByDeletedFalseAndAssetNameContainingIgnoreCaseOrderByAssetName(String assetName,
+            Pageable pageable);
 }
