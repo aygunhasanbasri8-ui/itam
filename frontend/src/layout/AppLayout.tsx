@@ -8,6 +8,8 @@ const NAV_ITEMS = [
   { to: '/clouds', label: 'Cloud Varlıkları' },
   { to: '/applications', label: 'Uygulama & Yazılım' },
   { to: '/business-services', label: 'İş Servisleri' },
+  { to: '/people', label: 'Kişiler' },
+  { to: '/departments', label: 'Departmanlar' },
   { to: '/custom-fields', label: 'Özel Alanlar' },
 ]
 

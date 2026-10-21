@@ -16,6 +16,10 @@ import { ApplicationFormPage } from './pages/applications/ApplicationFormPage'
 import { BusinessServiceListPage } from './pages/business-services/BusinessServiceListPage'
 import { BusinessServiceFormPage } from './pages/business-services/BusinessServiceFormPage'
 import { CustomFieldDefinitionsPage } from './pages/custom-fields/CustomFieldDefinitionsPage'
+import { PersonListPage } from './pages/people/PersonListPage'
+import { PersonFormPage } from './pages/people/PersonFormPage'
+import { DepartmentListPage } from './pages/departments/DepartmentListPage'
+import { DepartmentFormPage } from './pages/departments/DepartmentFormPage'
 
 const queryClient = new QueryClient()
 
@@ -50,6 +54,12 @@ export default function App() {
               <Route path="/business-services" element={<BusinessServiceListPage />} />
               <Route path="/business-services/new" element={<BusinessServiceFormPage />} />
               <Route path="/business-services/:id" element={<BusinessServiceFormPage />} />
+              <Route path="/people" element={<PersonListPage />} />
+              <Route path="/people/new" element={<PersonFormPage />} />
+              <Route path="/people/:id" element={<PersonFormPage />} />
+              <Route path="/departments" element={<DepartmentListPage />} />
+              <Route path="/departments/new" element={<DepartmentFormPage />} />
+              <Route path="/departments/:id" element={<DepartmentFormPage />} />
               <Route path="/custom-fields" element={<CustomFieldDefinitionsPage />} />
             </Route>
           </Routes>

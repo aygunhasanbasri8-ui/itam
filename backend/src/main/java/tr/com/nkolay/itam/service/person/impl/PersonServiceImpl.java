@@ -75,6 +75,10 @@ public class PersonServiceImpl implements PersonService {
         return mapper.toResponse(person);
     }
 
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
+    }
+
     private Person findOrThrow(Long id) {
         return personRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Kişi", id));
@@ -86,8 +90,9 @@ public class PersonServiceImpl implements PersonService {
         errors.throwIfInvalid();
 
         person.setFullName(request.fullName());
-        person.setCode(request.code());
-        person.setEmail(request.email());
+        // code ve email tekil indeksli; boş metin null'a çevrilmezse ikinci "" kaydı çakışır
+        person.setCode(blankToNull(request.code()));
+        person.setEmail(blankToNull(request.email()));
         person.setTitle(request.title());
         person.setPhone(request.phone());
         person.setDepartment(department);

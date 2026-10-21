@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { ExportButton } from '../../components/ExportButton'
 import { useSelection } from '../../hooks/useSelection'
+import { Pagination } from '../../components/Pagination'
 import { ASSET_STATUS_LABELS } from '../../types/common'
 import { listApplications } from '../../api/applications'
 
@@ -100,29 +101,7 @@ export function ApplicationListPage() {
             </tbody>
           </table>
 
-          <div className="flex items-center justify-between text-sm text-slate-500">
-            <span>
-              Sayfa {data.page + 1} / {Math.max(data.totalPages, 1)} — Toplam {data.totalElements} kayıt
-            </span>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                disabled={page === 0}
-                onClick={() => setPage((p) => p - 1)}
-                className="rounded border border-slate-300 px-3 py-1 disabled:opacity-40"
-              >
-                Önceki
-              </button>
-              <button
-                type="button"
-                disabled={data.last}
-                onClick={() => setPage((p) => p + 1)}
-                className="rounded border border-slate-300 px-3 py-1 disabled:opacity-40"
-              >
-                Sonraki
-              </button>
-            </div>
-          </div>
+          <Pagination data={data} page={page} onPageChange={setPage} />
         </>
       )}
     </div>
