@@ -13,6 +13,7 @@ public class AssetSummaryMapper {
                 asset.getId(),
                 asset.getAssetName(),
                 asset.getAssetType().getCode(),
-                asset.getStatus());
+                asset.getStatus(),
+                asset.getCreatedAt());
     }
 }

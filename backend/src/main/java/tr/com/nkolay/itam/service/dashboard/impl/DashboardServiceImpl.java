@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import tr.com.nkolay.itam.enums.AssetStatus;
 import tr.com.nkolay.itam.enums.ServerEnvironment;
+import tr.com.nkolay.itam.mapper.AssetSummaryMapper;
 import tr.com.nkolay.itam.model.dto.DashboardSummaryResponse;
 import tr.com.nkolay.itam.repository.ApplicationAssetRepository;
 import tr.com.nkolay.itam.repository.BaseAssetRepository;
@@ -24,13 +25,16 @@ public class DashboardServiceImpl implements DashboardService {
     private final BaseAssetRepository baseAssetRepository;
     private final ServerAssetRepository serverAssetRepository;
     private final ApplicationAssetRepository applicationAssetRepository;
+    private final AssetSummaryMapper assetSummaryMapper;
 
     public DashboardServiceImpl(BaseAssetRepository baseAssetRepository,
             ServerAssetRepository serverAssetRepository,
-            ApplicationAssetRepository applicationAssetRepository) {
+            ApplicationAssetRepository applicationAssetRepository,
+            AssetSummaryMapper assetSummaryMapper) {
         this.baseAssetRepository = baseAssetRepository;
         this.serverAssetRepository = serverAssetRepository;
         this.applicationAssetRepository = applicationAssetRepository;
+        this.assetSummaryMapper = assetSummaryMapper;
     }
 
     @Override
@@ -54,7 +58,10 @@ public class DashboardServiceImpl implements DashboardService {
                 byStatus,
                 byEnvironment,
                 expiringSoon,
-                expired);
+                expired,
+                baseAssetRepository.findTop5ByDeletedFalseOrderByCreatedAtDesc().stream()
+                        .map(assetSummaryMapper::toSummary)
+                        .toList());
     }
 
     private Map<String, Long> toMap(List<Object[]> rows, Function<Object[], String> keyExtractor) {

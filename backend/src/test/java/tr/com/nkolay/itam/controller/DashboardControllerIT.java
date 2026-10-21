@@ -52,6 +52,7 @@ class DashboardControllerIT extends AbstractIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.countByAssetType.SERVER").value(org.hamcrest.Matchers.greaterThanOrEqualTo(1)))
                 .andExpect(jsonPath("$.countByEnvironment.PROD").value(org.hamcrest.Matchers.greaterThanOrEqualTo(1)))
-                .andExpect(jsonPath("$.licensesExpiringSoon").value(org.hamcrest.Matchers.greaterThanOrEqualTo(1)));
+                .andExpect(jsonPath("$.licensesExpiringSoon").value(org.hamcrest.Matchers.greaterThanOrEqualTo(1)))
+                .andExpect(jsonPath("$.recentAssets.length()").value(org.hamcrest.Matchers.greaterThanOrEqualTo(1)));
     }
 }

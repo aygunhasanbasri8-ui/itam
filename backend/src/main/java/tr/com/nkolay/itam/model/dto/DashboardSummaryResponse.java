@@ -1,5 +1,6 @@
 package tr.com.nkolay.itam.model.dto;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -8,6 +9,7 @@ import java.util.Map;
  * @param countByEnvironment ServerEnvironment adı -> silinmemiş sunucu sayısı (yalnızca sunucular)
  * @param licensesExpiringSoon istek parametresindeki gün sayısı içinde süresi dolacak uygulama sayısı
  * @param licensesExpired      süresi bugünden önce dolmuş uygulama sayısı
+ * @param recentAssets         en son eklenen silinmemiş asset'ler, yeniden eskiye
  */
 public record DashboardSummaryResponse(
         long totalAssets,
@@ -15,5 +17,6 @@ public record DashboardSummaryResponse(
         Map<String, Long> countByStatus,
         Map<String, Long> countByEnvironment,
         long licensesExpiringSoon,
-        long licensesExpired) {
+        long licensesExpired,
+        List<AssetSummaryResponse> recentAssets) {
 }
