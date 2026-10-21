@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
 						fe.getField(),
 						fe.getCode(),
 						fe.getDefaultMessage(),
-						fe.getRejectedValue()))
+						maskSecret(fe.getField(), fe.getRejectedValue())))
 				.toList();
 		return build(HttpStatus.BAD_REQUEST, "validation", "Doğrulama hatası", errors);
 	}
@@ -141,6 +141,11 @@ public class GlobalExceptionHandler {
 		pd.setDetail("%d alan doğrulamadan geçemedi".formatted(errors.size()));
 		pd.setProperty("errors", errors);
 		return pd;
+	}
+
+	// Şifre gibi alanlar hata yanıtında ve loglarda geri basılmasın
+	private static Object maskSecret(String field, Object rejectedValue) {
+		return field.toLowerCase().contains("password") ? null : rejectedValue;
 	}
 
 	private ProblemDetail base(HttpStatus status, String type, String title) {

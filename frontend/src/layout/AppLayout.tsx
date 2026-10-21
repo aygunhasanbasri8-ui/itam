@@ -11,17 +11,18 @@ const NAV_ITEMS = [
   { to: '/people', label: 'Kişiler' },
   { to: '/departments', label: 'Departmanlar' },
   { to: '/custom-fields', label: 'Özel Alanlar' },
+  { to: '/users', label: 'Kullanıcılar', adminOnly: true },
 ]
 
 export function AppLayout() {
-  const { username, logout } = useAuth()
+  const { username, role, logout } = useAuth()
 
   return (
     <div className="flex h-screen bg-slate-50">
       <aside className="w-60 shrink-0 border-r border-slate-200 bg-white">
         <div className="px-4 py-4 text-lg font-semibold text-slate-800">ITAM</div>
         <nav className="flex flex-col gap-1 px-2">
-          {NAV_ITEMS.map((item) => (
+          {NAV_ITEMS.filter((item) => !item.adminOnly || role === 'ADMIN').map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
