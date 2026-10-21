@@ -23,6 +23,7 @@ import tr.com.nkolay.itam.enums.AssetStatus;
 import tr.com.nkolay.itam.enums.CloudProvider;
 import tr.com.nkolay.itam.model.dto.CloudAssetRequest;
 import tr.com.nkolay.itam.model.dto.CloudAssetResponse;
+import tr.com.nkolay.itam.model.dto.ExportColumnResponse;
 import tr.com.nkolay.itam.model.dto.PageResponse;
 import tr.com.nkolay.itam.service.asset.CloudAssetService;
 import tr.com.nkolay.itam.service.export.CloudExportService;
@@ -67,6 +68,11 @@ public class CloudAssetController {
     @PutMapping("/{id}")
     public CloudAssetResponse update(@PathVariable Long id, @Valid @RequestBody CloudAssetRequest request) {
         return cloudAssetService.update(id, request);
+    }
+
+    @GetMapping("/export/columns")
+    public List<ExportColumnResponse> exportColumns() {
+        return cloudExportService.columns();
     }
 
     @GetMapping("/export")

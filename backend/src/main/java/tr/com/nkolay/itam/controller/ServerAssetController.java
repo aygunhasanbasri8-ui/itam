@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import tr.com.nkolay.itam.enums.AssetStatus;
 import tr.com.nkolay.itam.enums.ServerEnvironment;
+import tr.com.nkolay.itam.model.dto.ExportColumnResponse;
 import tr.com.nkolay.itam.model.dto.PageResponse;
 import tr.com.nkolay.itam.model.dto.ServerAssetRequest;
 import tr.com.nkolay.itam.model.dto.ServerAssetResponse;
@@ -82,6 +83,11 @@ public class ServerAssetController {
      * yana, üretilen dosyalar (birkaç bin satır) zaten küçük, senkron yanıt
      * hem test etmesi hem izlemesi daha basit.
      */
+    @GetMapping("/export/columns")
+    public List<ExportColumnResponse> exportColumns() {
+        return serverExportService.columns();
+    }
+
     @GetMapping("/export")
     public ResponseEntity<byte[]> export(
             @RequestParam(required = false) String hostname,

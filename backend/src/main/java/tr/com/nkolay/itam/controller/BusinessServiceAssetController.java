@@ -23,6 +23,7 @@ import tr.com.nkolay.itam.enums.AssetStatus;
 import tr.com.nkolay.itam.enums.ServiceCriticality;
 import tr.com.nkolay.itam.model.dto.BusinessServiceAssetRequest;
 import tr.com.nkolay.itam.model.dto.BusinessServiceAssetResponse;
+import tr.com.nkolay.itam.model.dto.ExportColumnResponse;
 import tr.com.nkolay.itam.model.dto.PageResponse;
 import tr.com.nkolay.itam.service.asset.BusinessServiceAssetService;
 import tr.com.nkolay.itam.service.export.BusinessServiceExportService;
@@ -69,6 +70,11 @@ public class BusinessServiceAssetController {
     public BusinessServiceAssetResponse update(@PathVariable Long id,
             @Valid @RequestBody BusinessServiceAssetRequest request) {
         return businessServiceAssetService.update(id, request);
+    }
+
+    @GetMapping("/export/columns")
+    public List<ExportColumnResponse> exportColumns() {
+        return businessServiceExportService.columns();
     }
 
     @GetMapping("/export")
