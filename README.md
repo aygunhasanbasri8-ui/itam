@@ -2,7 +2,7 @@
 
 Kurum bünyesindeki tüm donanım, yazılım ve iş servisi varlıklarının tek merkezden yönetildiği, denetim standartlarına uygun envanter yönetim sistemi.
 
-**Durum:** Backend Faz 0-6 tamamlandı (CRUD, kimlik doğrulama, bağımlılık haritası, denetim izi, custom field, dashboard). Frontend Faz 2'de: iskelet + kimlik doğrulama + sunucu CRUD ekranı hazır, kalan 4 asset tipi ve özel ekranlar (bağımlılık haritası, denetim izi, custom field) sırada.
+**Durum:** Backend Faz 0-6 tamamlandı (CRUD, kimlik doğrulama, kullanıcı yönetimi, bağımlılık haritası, denetim izi, custom field, dashboard). Frontend'de 5 asset tipinin liste/form ekranları (toplu durum güncelleme, Excel'e aktarma, özel alanlar, bağımlılık ve değişiklik geçmişi panelleri), kişi/departman/kullanıcı yönetimi ve özel alan tanımları hazır.
 
 ---
 
@@ -97,7 +97,7 @@ otomatik olarak backend'e (8080) proxy'ler, ayrıca CORS ayarı gerekmez. Ayrın
 itam/
 ├── backend/          Spring Boot uygulaması
 ├── frontend/         React uygulaması
-├── docker/           docker-compose.yml
+├── docker-compose.yml
 └── docs/             Tasarım raporu ve yol haritası
 ```
 
