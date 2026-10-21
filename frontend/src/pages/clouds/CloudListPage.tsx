@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { ExportButton } from '../../components/ExportButton'
 import { useSelection } from '../../hooks/useSelection'
+import { formatCustomFieldValue, useListCustomFields } from '../../hooks/useListCustomFields'
 import { Pagination } from '../../components/Pagination'
 import { ASSET_STATUS_LABELS } from '../../types/common'
 import { listClouds } from '../../api/clouds'
@@ -12,6 +13,7 @@ export function CloudListPage() {
   const [provider, setProvider] = useState('')
   const [page, setPage] = useState(0)
   const selection = useSelection()
+  const listFields = useListCustomFields('CLOUD')
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['clouds', { provider, page }],
@@ -71,6 +73,11 @@ export function CloudListPage() {
                 <th className="px-4 py-2">Bölge</th>
                 <th className="px-4 py-2">Sorumlu</th>
                 <th className="px-4 py-2">Durum</th>
+                {listFields.map((definition) => (
+                  <th key={definition.id} className="px-4 py-2">
+                    {definition.label}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -94,11 +101,16 @@ export function CloudListPage() {
                   <td className="px-4 py-2 text-slate-600">{cloud.region ?? '-'}</td>
                   <td className="px-4 py-2 text-slate-600">{cloud.responsibilityOwner?.fullName ?? '-'}</td>
                   <td className="px-4 py-2 text-slate-600">{ASSET_STATUS_LABELS[cloud.status]}</td>
+                  {listFields.map((definition) => (
+                    <td key={definition.id} className="px-4 py-2 text-slate-600">
+                      {formatCustomFieldValue(definition, cloud.customFields[definition.fieldKey])}
+                    </td>
+                  ))}
                 </tr>
               ))}
               {data.content.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-6 text-center text-slate-400">
+                  <td colSpan={7 + listFields.length} className="px-4 py-6 text-center text-slate-400">
                     Kayıt bulunamadı.
                   </td>
                 </tr>

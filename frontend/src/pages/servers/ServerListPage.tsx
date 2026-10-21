@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { ExportButton } from '../../components/ExportButton'
 import { useSelection } from '../../hooks/useSelection'
+import { formatCustomFieldValue, useListCustomFields } from '../../hooks/useListCustomFields'
 import { Pagination } from '../../components/Pagination'
 import { listServers } from '../../api/servers'
 import { ASSET_STATUS_LABELS } from '../../types/common'
@@ -13,6 +14,7 @@ export function ServerListPage() {
   const [environment, setEnvironment] = useState('')
   const [page, setPage] = useState(0)
   const selection = useSelection()
+  const listFields = useListCustomFields('SERVER')
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['servers', { hostname, environment, page }],
@@ -88,6 +90,11 @@ export function ServerListPage() {
                 <th className="px-4 py-2">Ortam</th>
                 <th className="px-4 py-2">Durum</th>
                 <th className="px-4 py-2">Sorumlu</th>
+                {listFields.map((definition) => (
+                  <th key={definition.id} className="px-4 py-2">
+                    {definition.label}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -110,11 +117,16 @@ export function ServerListPage() {
                   <td className="px-4 py-2 text-slate-600">{server.environment}</td>
                   <td className="px-4 py-2 text-slate-600">{ASSET_STATUS_LABELS[server.status] ?? server.status}</td>
                   <td className="px-4 py-2 text-slate-600">{server.responsibilityOwner?.fullName ?? '-'}</td>
+                  {listFields.map((definition) => (
+                    <td key={definition.id} className="px-4 py-2 text-slate-600">
+                      {formatCustomFieldValue(definition, server.customFields[definition.fieldKey])}
+                    </td>
+                  ))}
                 </tr>
               ))}
               {data.content.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-6 text-center text-slate-400">
+                  <td colSpan={6 + listFields.length} className="px-4 py-6 text-center text-slate-400">
                     Kayıt bulunamadı.
                   </td>
                 </tr>
