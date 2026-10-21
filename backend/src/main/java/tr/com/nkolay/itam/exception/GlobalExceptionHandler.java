@@ -7,10 +7,13 @@ import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import tr.com.nkolay.itam.model.dto.ErrorDetail;
 
@@ -99,8 +102,32 @@ public class GlobalExceptionHandler {
 		return pd;
 	}
 
+	/** Bozuk JSON ya da enum'a uymayan bir değer; Jackson'ın iç mesajını dışarı vermiyoruz. */
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	ProblemDetail handleUnreadableBody(HttpMessageNotReadableException ex) {
+		ProblemDetail pd = base(HttpStatus.BAD_REQUEST, "invalid-request", "Geçersiz istek");
+		pd.setDetail("İstek gövdesi okunamadı; JSON biçimini ve alan değerlerini kontrol edin.");
+		return pd;
+	}
+
+	/** /servers/abc gibi sayı beklenen yerde metin gelmesi. */
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	ProblemDetail handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+		ProblemDetail pd = base(HttpStatus.BAD_REQUEST, "invalid-request", "Geçersiz istek");
+		pd.setDetail("'%s' parametresi için geçersiz değer: %s".formatted(ex.getName(), ex.getValue()));
+		return pd;
+	}
+
 	@ExceptionHandler(Exception.class)
 	ProblemDetail handleUnexpected(Exception ex) {
+		// Bilinmeyen adres, desteklenmeyen metot, eksik parametre gibi Spring MVC
+		// hataları kendi durum kodunu taşıyor; bunları 500'e çevirmek istemciyi yanıltır.
+		if (ex instanceof ErrorResponse errorResponse) {
+			HttpStatus status = HttpStatus.valueOf(errorResponse.getStatusCode().value());
+			ProblemDetail pd = base(status, "invalid-request", status.getReasonPhrase());
+			pd.setDetail(errorResponse.getBody().getDetail());
+			return pd;
+		}
 		log.error("Beklenmeyen hata", ex);
 		ProblemDetail pd = base(HttpStatus.INTERNAL_SERVER_ERROR, "internal",
 				"Beklenmeyen bir hata oluştu");
