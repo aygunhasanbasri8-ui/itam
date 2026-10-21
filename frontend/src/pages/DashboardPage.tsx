@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { getDashboardSummary } from '../api/dashboard'
-import { ASSET_TYPE_LABELS } from '../types/assetType'
+import { ASSET_TYPE_LABELS, ASSET_TYPE_ROUTES } from '../types/assetType'
 import { ASSET_STATUS_LABELS } from '../types/common'
 import { Link } from 'react-router-dom'
 
@@ -83,6 +83,29 @@ export function DashboardPage() {
         <DistributionCard title="Asset Tipi Dağılımı" data={data.countByAssetType} labels={ASSET_TYPE_LABELS} />
         <DistributionCard title="Durum Dağılımı" data={data.countByStatus} labels={ASSET_STATUS_LABELS} />
         <DistributionCard title="Sunucu Ortam Dağılımı" data={data.countByEnvironment} />
+      </div>
+
+      <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="mb-3 text-sm font-medium text-slate-700">Son Eklenen Varlıklar</div>
+        {data.recentAssets.length === 0 ? (
+          <p className="text-sm text-slate-400">Kayıt yok</p>
+        ) : (
+          <ul className="divide-y divide-slate-100 text-sm">
+            {data.recentAssets.map((asset) => (
+              <li key={asset.id} className="flex items-center justify-between py-2">
+                <Link
+                  to={`${ASSET_TYPE_ROUTES[asset.assetTypeCode]}/${asset.id}`}
+                  className="font-medium text-slate-800 hover:underline"
+                >
+                  {asset.assetName}
+                </Link>
+                <span className="text-slate-500">
+                  {ASSET_TYPE_LABELS[asset.assetTypeCode]} · {new Date(asset.createdAt).toLocaleDateString('tr-TR')}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   )

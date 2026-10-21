@@ -30,4 +30,7 @@ public interface BaseAssetRepository extends JpaRepository<BaseAsset, Long> {
     @EntityGraph(attributePaths = "assetType")
     List<BaseAsset> findByDeletedFalseAndAssetNameContainingIgnoreCaseOrderByAssetName(String assetName,
             Pageable pageable);
+
+    @EntityGraph(attributePaths = "assetType")
+    List<BaseAsset> findTop5ByDeletedFalseOrderByCreatedAtDesc();
 }
