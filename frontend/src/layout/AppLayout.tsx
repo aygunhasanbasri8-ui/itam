@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { to: '/business-services', label: 'İş Servisleri' },
   { to: '/people', label: 'Kişiler' },
   { to: '/departments', label: 'Departmanlar' },
+  { to: '/asset-types', label: 'Asset Tipleri' },
   { to: '/custom-fields', label: 'Özel Alanlar' },
   { to: '/users', label: 'Kullanıcılar', adminOnly: true },
 ]
