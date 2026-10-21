@@ -5,6 +5,8 @@ import { createCloud, getCloud, updateCloud } from '../../api/clouds'
 import { listActivePeople } from '../../api/people'
 import { extractErrorMessage } from '../../api/client'
 import { Field } from '../../components/Field'
+import { DependencyPanel } from '../../components/DependencyPanel'
+import { AuditTrailPanel } from '../../components/AuditTrailPanel'
 import type { CloudAssetRequest, CloudProvider } from '../../types/cloud'
 
 const EMPTY_FORM: CloudAssetRequest = { assetName: '', cloudProvider: 'AWS' }
@@ -157,6 +159,13 @@ export function CloudFormPage() {
           </button>
         </div>
       </form>
+
+      {isEdit && (
+        <>
+          <DependencyPanel assetId={Number(id)} />
+          <AuditTrailPanel assetId={Number(id)} />
+        </>
+      )}
     </div>
   )
 }

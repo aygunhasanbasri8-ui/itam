@@ -5,6 +5,8 @@ import { createServer, getServer, updateServer } from '../../api/servers'
 import { listActivePeople } from '../../api/people'
 import { extractErrorMessage } from '../../api/client'
 import { Field } from '../../components/Field'
+import { DependencyPanel } from '../../components/DependencyPanel'
+import { AuditTrailPanel } from '../../components/AuditTrailPanel'
 import type { ServerAssetRequest, ServerEnvironment } from '../../types/server'
 
 const EMPTY_FORM: ServerAssetRequest = {
@@ -185,6 +187,13 @@ export function ServerFormPage() {
           </button>
         </div>
       </form>
+
+      {isEdit && (
+        <>
+          <DependencyPanel assetId={Number(id)} />
+          <AuditTrailPanel assetId={Number(id)} />
+        </>
+      )}
     </div>
   )
 }

@@ -5,6 +5,8 @@ import { createApplication, getApplication, updateApplication } from '../../api/
 import { listActivePeople } from '../../api/people'
 import { extractErrorMessage } from '../../api/client'
 import { Field } from '../../components/Field'
+import { DependencyPanel } from '../../components/DependencyPanel'
+import { AuditTrailPanel } from '../../components/AuditTrailPanel'
 import type { ApplicationAssetRequest } from '../../types/application'
 
 const EMPTY_FORM: ApplicationAssetRequest = { assetName: '' }
@@ -168,6 +170,13 @@ export function ApplicationFormPage() {
           </button>
         </div>
       </form>
+
+      {isEdit && (
+        <>
+          <DependencyPanel assetId={Number(id)} />
+          <AuditTrailPanel assetId={Number(id)} />
+        </>
+      )}
     </div>
   )
 }
