@@ -8,6 +8,7 @@ import { useIsAdmin } from '../../auth/useIsAdmin'
 import { Field } from '../../components/Field'
 import { PersonSelect } from '../../components/PersonSelect'
 import { CustomFieldInputs } from '../../components/CustomFieldInputs'
+import { DeleteAssetButton } from '../../components/DeleteAssetButton'
 import { DependencyPanel } from '../../components/DependencyPanel'
 import { AuditTrailPanel } from '../../components/AuditTrailPanel'
 import type { ServerAssetRequest, ServerEnvironment } from '../../types/server'
@@ -262,6 +263,9 @@ export function ServerFormPage() {
           >
             Vazgeç
           </button>
+          {isEdit && isAdmin && (
+            <DeleteAssetButton assetId={Number(id)} onDeleted={() => navigate('/servers')} />
+          )}
         </div>
       </form>
 

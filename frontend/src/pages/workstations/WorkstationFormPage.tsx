@@ -9,6 +9,7 @@ import { useIsAdmin } from '../../auth/useIsAdmin'
 import type { WorkstationAssetRequest } from '../../types/workstation'
 import { Field } from '../../components/Field'
 import { CustomFieldInputs } from '../../components/CustomFieldInputs'
+import { DeleteAssetButton } from '../../components/DeleteAssetButton'
 import { DependencyPanel } from '../../components/DependencyPanel'
 import { AuditTrailPanel } from '../../components/AuditTrailPanel'
 
@@ -206,6 +207,9 @@ export function WorkstationFormPage() {
           >
             Vazgeç
           </button>
+          {isEdit && isAdmin && (
+            <DeleteAssetButton assetId={Number(id)} onDeleted={() => navigate('/workstations')} />
+          )}
         </div>
       </form>
 
