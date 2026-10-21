@@ -3,6 +3,7 @@ import { useAuth } from '../auth/AuthContext'
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', end: true },
+  { to: '/assets', label: 'Tüm Varlıklar' },
   { to: '/servers', label: 'Sunucular' },
   { to: '/workstations', label: 'İş İstasyonları' },
   { to: '/clouds', label: 'Cloud Varlıkları' },

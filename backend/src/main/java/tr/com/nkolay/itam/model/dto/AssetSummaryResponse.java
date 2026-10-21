@@ -4,11 +4,12 @@ import java.time.OffsetDateTime;
 
 import tr.com.nkolay.itam.enums.AssetStatus;
 
-/** Tipten bağımsız asset aramasının satırı; seçim kutuları için bu kadarı yetiyor. */
+/** Tipten bağımsız listelerin (arama, tüm varlıklar, son eklenenler) satırı. */
 public record AssetSummaryResponse(
         Long id,
         String assetName,
         String assetTypeCode,
         AssetStatus status,
+        PersonSummary responsibilityOwner,
         OffsetDateTime createdAt) {
 }

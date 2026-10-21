@@ -53,4 +53,24 @@ class AssetSearchControllerIT extends AbstractIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
     }
+
+    @Test
+    @WithMockUser(username = "test-admin", roles = "ADMIN")
+    @DisplayName("tüm tipler listesi tipe ve isme göre süzülebiliyor, sorumlu da geliyor")
+    void tumTiplerListesiSuzuluyor() throws Exception {
+        mockMvc.perform(post("/api/v1/servers").contentType(MediaType.APPLICATION_JSON).content("""
+                        {"assetName": "Liste Sunucusu", "hostname": "liste-01.nkolay.local", "environment": "TEST"}
+                        """))
+                .andExpect(status().isCreated());
+        mockMvc.perform(post("/api/v1/applications").contentType(MediaType.APPLICATION_JSON).content("""
+                        {"assetName": "Liste Uygulaması"}
+                        """))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/v1/assets").param("q", "liste").param("assetType", "APPLICATION"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].assetName").value("Liste Uygulaması"))
+                .andExpect(jsonPath("$.content[0].responsibilityOwner.fullName").exists());
+    }
 }
