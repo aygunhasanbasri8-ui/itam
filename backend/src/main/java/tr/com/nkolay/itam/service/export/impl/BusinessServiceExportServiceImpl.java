@@ -20,6 +20,7 @@ import tr.com.nkolay.itam.enums.AssetStatus;
 import tr.com.nkolay.itam.enums.ServiceCriticality;
 import tr.com.nkolay.itam.model.entity.BusinessServiceAsset;
 import tr.com.nkolay.itam.repository.BusinessServiceAssetRepository;
+import tr.com.nkolay.itam.repository.spec.BaseAssetSpecifications;
 import tr.com.nkolay.itam.repository.spec.BusinessServiceAssetSpecifications;
 import tr.com.nkolay.itam.service.export.BusinessServiceExportColumn;
 import tr.com.nkolay.itam.service.export.BusinessServiceExportService;
@@ -40,20 +41,22 @@ public class BusinessServiceExportServiceImpl implements BusinessServiceExportSe
 
     @Override
     public void writeXlsx(OutputStream out, ServiceCriticality criticality, AssetStatus status,
+            Long responsibilityOwnerId,
             List<String> columns, String requestedBy) {
         List<BusinessServiceExportColumn> resolvedColumns = resolveColumns(columns);
 
         Specification<BusinessServiceAsset> spec = Specification
                 .where(BusinessServiceAssetSpecifications.notDeleted())
                 .and(BusinessServiceAssetSpecifications.criticalityEquals(criticality))
-                .and(BusinessServiceAssetSpecifications.statusEquals(status));
+                .and(BusinessServiceAssetSpecifications.statusEquals(status))
+                .and(BaseAssetSpecifications.responsibilityOwnerEquals(responsibilityOwnerId));
 
         List<BusinessServiceAsset> services = businessServiceAssetRepository.findAll(spec);
 
         SXSSFWorkbook workbook = new SXSSFWorkbook(SXSSF_WINDOW_SIZE);
         try {
             Sheet sheet = workbook.createSheet("İş Servisleri");
-            int rowIndex = writeMetaBlock(sheet, requestedBy, criticality, status);
+            int rowIndex = writeMetaBlock(sheet, requestedBy, criticality, status, responsibilityOwnerId);
             rowIndex = writeHeaderRow(sheet, resolvedColumns, rowIndex);
             writeDataRows(sheet, resolvedColumns, services, rowIndex);
 
@@ -82,19 +85,22 @@ public class BusinessServiceExportServiceImpl implements BusinessServiceExportSe
     }
 
     private int writeMetaBlock(Sheet sheet, String requestedBy, ServiceCriticality criticality,
-            AssetStatus status) {
+            AssetStatus status, Long responsibilityOwnerId) {
         int rowIndex = 0;
         createTextRow(sheet, rowIndex++, "Üretim tarihi: " + OffsetDateTime.now().format(TIMESTAMP_FORMAT));
         createTextRow(sheet, rowIndex++, "Üreten kullanıcı: " + requestedBy);
-        createTextRow(sheet, rowIndex++, "Uygulanan filtreler: " + describeFilters(criticality, status));
+        createTextRow(sheet, rowIndex++, "Uygulanan filtreler: " + describeFilters(criticality, status,
+                responsibilityOwnerId));
         rowIndex++;
         return rowIndex;
     }
 
-    private String describeFilters(ServiceCriticality criticality, AssetStatus status) {
+    private String describeFilters(ServiceCriticality criticality, AssetStatus status,
+            Long responsibilityOwnerId) {
         List<String> parts = new ArrayList<>();
         if (criticality != null) parts.add("criticality=" + criticality);
         if (status != null) parts.add("status=" + status);
+        if (responsibilityOwnerId != null) parts.add("responsibilityOwnerId=" + responsibilityOwnerId);
         return parts.isEmpty() ? "(filtre uygulanmadı)" : String.join(", ", parts);
     }
 

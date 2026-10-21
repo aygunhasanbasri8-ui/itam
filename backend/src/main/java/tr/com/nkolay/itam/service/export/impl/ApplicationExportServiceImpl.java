@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tr.com.nkolay.itam.enums.AssetStatus;
 import tr.com.nkolay.itam.model.entity.ApplicationAsset;
 import tr.com.nkolay.itam.repository.ApplicationAssetRepository;
+import tr.com.nkolay.itam.repository.spec.BaseAssetSpecifications;
 import tr.com.nkolay.itam.repository.spec.ApplicationAssetSpecifications;
 import tr.com.nkolay.itam.service.export.ApplicationExportColumn;
 import tr.com.nkolay.itam.service.export.ApplicationExportService;
@@ -39,7 +40,8 @@ public class ApplicationExportServiceImpl implements ApplicationExportService {
     }
 
     @Override
-    public void writeXlsx(OutputStream out, String vendor, AssetStatus status, LocalDate expiryBefore,
+    public void writeXlsx(OutputStream out, String vendor, AssetStatus status,
+            Long responsibilityOwnerId, LocalDate expiryBefore,
             List<String> columns, String requestedBy) {
         List<ApplicationExportColumn> resolvedColumns = resolveColumns(columns);
 
@@ -47,6 +49,7 @@ public class ApplicationExportServiceImpl implements ApplicationExportService {
                 .where(ApplicationAssetSpecifications.notDeleted())
                 .and(ApplicationAssetSpecifications.vendorContains(vendor))
                 .and(ApplicationAssetSpecifications.statusEquals(status))
+                .and(BaseAssetSpecifications.responsibilityOwnerEquals(responsibilityOwnerId))
                 .and(ApplicationAssetSpecifications.expiryBefore(expiryBefore));
 
         List<ApplicationAsset> applications = applicationAssetRepository.findAll(spec);
@@ -54,7 +57,8 @@ public class ApplicationExportServiceImpl implements ApplicationExportService {
         SXSSFWorkbook workbook = new SXSSFWorkbook(SXSSF_WINDOW_SIZE);
         try {
             Sheet sheet = workbook.createSheet("Uygulama-Yazılım");
-            int rowIndex = writeMetaBlock(sheet, requestedBy, vendor, status, expiryBefore);
+            int rowIndex = writeMetaBlock(sheet, requestedBy, vendor, status, responsibilityOwnerId,
+                    expiryBefore);
             rowIndex = writeHeaderRow(sheet, resolvedColumns, rowIndex);
             writeDataRows(sheet, resolvedColumns, applications, rowIndex);
 
@@ -83,19 +87,23 @@ public class ApplicationExportServiceImpl implements ApplicationExportService {
     }
 
     private int writeMetaBlock(Sheet sheet, String requestedBy, String vendor, AssetStatus status,
+            Long responsibilityOwnerId,
             LocalDate expiryBefore) {
         int rowIndex = 0;
         createTextRow(sheet, rowIndex++, "Üretim tarihi: " + OffsetDateTime.now().format(TIMESTAMP_FORMAT));
         createTextRow(sheet, rowIndex++, "Üreten kullanıcı: " + requestedBy);
-        createTextRow(sheet, rowIndex++, "Uygulanan filtreler: " + describeFilters(vendor, status, expiryBefore));
+        createTextRow(sheet, rowIndex++, "Uygulanan filtreler: " + describeFilters(vendor, status,
+                responsibilityOwnerId, expiryBefore));
         rowIndex++;
         return rowIndex;
     }
 
-    private String describeFilters(String vendor, AssetStatus status, LocalDate expiryBefore) {
+    private String describeFilters(String vendor, AssetStatus status, Long responsibilityOwnerId,
+            LocalDate expiryBefore) {
         List<String> parts = new ArrayList<>();
         if (vendor != null && !vendor.isBlank()) parts.add("vendor~" + vendor);
         if (status != null) parts.add("status=" + status);
+        if (responsibilityOwnerId != null) parts.add("responsibilityOwnerId=" + responsibilityOwnerId);
         if (expiryBefore != null) parts.add("expiryBefore=" + expiryBefore);
         return parts.isEmpty() ? "(filtre uygulanmadı)" : String.join(", ", parts);
     }

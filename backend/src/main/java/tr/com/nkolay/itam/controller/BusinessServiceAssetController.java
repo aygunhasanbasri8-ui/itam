@@ -50,8 +50,9 @@ public class BusinessServiceAssetController {
     public PageResponse<BusinessServiceAssetResponse> list(
             @RequestParam(required = false) ServiceCriticality criticality,
             @RequestParam(required = false) AssetStatus status,
+            @RequestParam(required = false) Long responsibilityOwnerId,
             @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        return businessServiceAssetService.list(criticality, status, pageable);
+        return businessServiceAssetService.list(criticality, status, responsibilityOwnerId, pageable);
     }
 
     @GetMapping("/{id}")
@@ -81,10 +82,12 @@ public class BusinessServiceAssetController {
     public ResponseEntity<byte[]> export(
             @RequestParam(required = false) ServiceCriticality criticality,
             @RequestParam(required = false) AssetStatus status,
+            @RequestParam(required = false) Long responsibilityOwnerId,
             @RequestParam(required = false) List<String> columns,
             Authentication authentication) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        businessServiceExportService.writeXlsx(out, criticality, status, columns, authentication.getName());
+        businessServiceExportService.writeXlsx(out, criticality, status, responsibilityOwnerId, columns,
+                authentication.getName());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=is-servisleri.xlsx")

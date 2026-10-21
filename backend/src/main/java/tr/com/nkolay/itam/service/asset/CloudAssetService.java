@@ -11,7 +11,7 @@ import tr.com.nkolay.itam.model.dto.PageResponse;
 public interface CloudAssetService {
 
     PageResponse<CloudAssetResponse> list(CloudProvider provider, String region,
-            AssetStatus status, Pageable pageable);
+            AssetStatus status, Long responsibilityOwnerId, Pageable pageable);
 
     CloudAssetResponse get(Long id);
 

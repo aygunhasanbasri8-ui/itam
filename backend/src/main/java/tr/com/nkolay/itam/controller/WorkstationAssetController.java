@@ -49,10 +49,12 @@ public class WorkstationAssetController {
     public PageResponse<WorkstationAssetResponse> list(
             @RequestParam(required = false) String serialNumber,
             @RequestParam(required = false) AssetStatus status,
+            @RequestParam(required = false) Long responsibilityOwnerId,
             @RequestParam(required = false) Long departmentId,
             @RequestParam(required = false) Long assignedPersonId,
             @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        return workstationAssetService.list(serialNumber, status, departmentId, assignedPersonId, pageable);
+        return workstationAssetService.list(serialNumber, status, responsibilityOwnerId, departmentId,
+                assignedPersonId, pageable);
     }
 
     @GetMapping("/{id}")
@@ -81,12 +83,14 @@ public class WorkstationAssetController {
     public ResponseEntity<byte[]> export(
             @RequestParam(required = false) String serialNumber,
             @RequestParam(required = false) AssetStatus status,
+            @RequestParam(required = false) Long responsibilityOwnerId,
             @RequestParam(required = false) Long departmentId,
             @RequestParam(required = false) Long assignedPersonId,
             @RequestParam(required = false) List<String> columns,
             Authentication authentication) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        workstationExportService.writeXlsx(out, serialNumber, status, departmentId, assignedPersonId,
+        workstationExportService.writeXlsx(out, serialNumber, status, responsibilityOwnerId,
+                departmentId, assignedPersonId,
                 columns, authentication.getName());
 
         return ResponseEntity.ok()

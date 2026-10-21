@@ -11,7 +11,7 @@ import tr.com.nkolay.itam.model.dto.PageResponse;
 
 public interface ApplicationAssetService {
 
-    PageResponse<ApplicationAssetResponse> list(String vendor, AssetStatus status,
+    PageResponse<ApplicationAssetResponse> list(String vendor, AssetStatus status, Long responsibilityOwnerId,
             LocalDate expiryBefore, Pageable pageable);
 
     ApplicationAssetResponse get(Long id);

@@ -21,6 +21,7 @@ import tr.com.nkolay.itam.model.entity.Person;
 import tr.com.nkolay.itam.repository.AssetTypeDefinitionRepository;
 import tr.com.nkolay.itam.repository.BusinessServiceAssetRepository;
 import tr.com.nkolay.itam.repository.PersonRepository;
+import tr.com.nkolay.itam.repository.spec.BaseAssetSpecifications;
 import tr.com.nkolay.itam.repository.spec.BusinessServiceAssetSpecifications;
 import tr.com.nkolay.itam.service.asset.BusinessServiceAssetService;
 import tr.com.nkolay.itam.service.customfield.CustomFieldValidator;
@@ -53,11 +54,12 @@ public class BusinessServiceAssetServiceImpl implements BusinessServiceAssetServ
     @Override
     @Transactional(readOnly = true)
     public PageResponse<BusinessServiceAssetResponse> list(ServiceCriticality criticality,
-            AssetStatus status, Pageable pageable) {
+            AssetStatus status, Long responsibilityOwnerId, Pageable pageable) {
         Specification<BusinessServiceAsset> spec = Specification
                 .where(BusinessServiceAssetSpecifications.notDeleted())
                 .and(BusinessServiceAssetSpecifications.criticalityEquals(criticality))
-                .and(BusinessServiceAssetSpecifications.statusEquals(status));
+                .and(BusinessServiceAssetSpecifications.statusEquals(status))
+                .and(BaseAssetSpecifications.responsibilityOwnerEquals(responsibilityOwnerId));
 
         Page<BusinessServiceAsset> page = businessServiceAssetRepository.findAll(spec, pageable);
         return PageResponse.of(page, mapper::toResponse);

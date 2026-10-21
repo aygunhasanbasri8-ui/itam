@@ -11,6 +11,7 @@ import tr.com.nkolay.itam.model.dto.ExportColumnResponse;
 public interface CloudExportService {
 
     void writeXlsx(OutputStream out, CloudProvider provider, String region, AssetStatus status,
+            Long responsibilityOwnerId,
             List<String> columns, String requestedBy);
 
     default List<ExportColumnResponse> columns() {

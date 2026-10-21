@@ -50,8 +50,9 @@ public class CloudAssetController {
             @RequestParam(required = false) CloudProvider provider,
             @RequestParam(required = false) String region,
             @RequestParam(required = false) AssetStatus status,
+            @RequestParam(required = false) Long responsibilityOwnerId,
             @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        return cloudAssetService.list(provider, region, status, pageable);
+        return cloudAssetService.list(provider, region, status, responsibilityOwnerId, pageable);
     }
 
     @GetMapping("/{id}")
@@ -80,10 +81,12 @@ public class CloudAssetController {
             @RequestParam(required = false) CloudProvider provider,
             @RequestParam(required = false) String region,
             @RequestParam(required = false) AssetStatus status,
+            @RequestParam(required = false) Long responsibilityOwnerId,
             @RequestParam(required = false) List<String> columns,
             Authentication authentication) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        cloudExportService.writeXlsx(out, provider, region, status, columns, authentication.getName());
+        cloudExportService.writeXlsx(out, provider, region, status, responsibilityOwnerId, columns,
+                authentication.getName());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=cloud-varliklari.xlsx")

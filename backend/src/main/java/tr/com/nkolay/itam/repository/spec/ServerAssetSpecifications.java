@@ -42,11 +42,4 @@ public final class ServerAssetSpecifications {
         }
         return (root, query, cb) -> cb.equal(root.get("status"), status);
     }
-
-    public static Specification<ServerAsset> responsibilityOwnerEquals(Long personId) {
-        if (personId == null) {
-            return null;
-        }
-        return (root, query, cb) -> cb.equal(root.get("responsibilityOwner").get("id"), personId);
-    }
 }
