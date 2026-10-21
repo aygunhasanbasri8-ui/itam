@@ -5,6 +5,7 @@ import { createServer, getServer, updateServer } from '../../api/servers'
 import { listActivePeople } from '../../api/people'
 import { extractErrorMessage } from '../../api/client'
 import { Field } from '../../components/Field'
+import { PersonSelect } from '../../components/PersonSelect'
 import { CustomFieldInputs } from '../../components/CustomFieldInputs'
 import { DependencyPanel } from '../../components/DependencyPanel'
 import { AuditTrailPanel } from '../../components/AuditTrailPanel'
@@ -49,7 +50,15 @@ export function ServerFormPage() {
         domain: existing.domain ?? '',
         ipAddress: existing.ipAddress ?? '',
         os: existing.os ?? '',
+        serverClass: existing.serverClass ?? '',
+        infrastructureType: existing.infrastructureType ?? '',
+        groupName: existing.groupName ?? '',
+        groupInfo: existing.groupInfo ?? '',
+        groupDesc: existing.groupDesc ?? '',
         responsibilityOwnerId: existing.responsibilityOwner?.id ?? null,
+        serviceOwnerId: existing.serviceOwner?.id ?? null,
+        appResponsibleId: existing.appResponsible?.id ?? null,
+        osResponsibleId: existing.osResponsible?.id ?? null,
         customFields: existing.customFields,
       })
     }
@@ -135,20 +144,68 @@ export function ServerFormPage() {
           </Field>
 
           <Field label="Sorumlu Kişi">
-            <select
+            <PersonSelect
+              people={people}
+              value={form.responsibilityOwnerId}
+              onChange={(responsibilityOwnerId) => setForm({ ...form, responsibilityOwnerId })}
+              emptyLabel="FIRMA (varsayılan)"
+            />
+          </Field>
+
+          <Field label="Sunucu Sınıfı">
+            <input
               className="input"
-              value={form.responsibilityOwnerId ?? ''}
-              onChange={(e) =>
-                setForm({ ...form, responsibilityOwnerId: e.target.value ? Number(e.target.value) : null })
-              }
-            >
-              <option value="">FIRMA (varsayılan)</option>
-              {people?.map((person) => (
-                <option key={person.id} value={person.id}>
-                  {person.fullName}
-                </option>
-              ))}
-            </select>
+              value={form.serverClass ?? ''}
+              onChange={(e) => setForm({ ...form, serverClass: e.target.value })}
+            />
+          </Field>
+
+          <Field label="Altyapı Tipi">
+            <input
+              className="input"
+              value={form.infrastructureType ?? ''}
+              onChange={(e) => setForm({ ...form, infrastructureType: e.target.value })}
+            />
+          </Field>
+
+          <Field label="Grup Adı">
+            <input
+              className="input"
+              value={form.groupName ?? ''}
+              onChange={(e) => setForm({ ...form, groupName: e.target.value })}
+            />
+          </Field>
+
+          <Field label="Grup Bilgisi">
+            <input
+              className="input"
+              value={form.groupInfo ?? ''}
+              onChange={(e) => setForm({ ...form, groupInfo: e.target.value })}
+            />
+          </Field>
+
+          <Field label="Servis Sahibi">
+            <PersonSelect
+              people={people}
+              value={form.serviceOwnerId}
+              onChange={(serviceOwnerId) => setForm({ ...form, serviceOwnerId })}
+            />
+          </Field>
+
+          <Field label="Uygulama Sorumlusu">
+            <PersonSelect
+              people={people}
+              value={form.appResponsibleId}
+              onChange={(appResponsibleId) => setForm({ ...form, appResponsibleId })}
+            />
+          </Field>
+
+          <Field label="OS Sorumlusu">
+            <PersonSelect
+              people={people}
+              value={form.osResponsibleId}
+              onChange={(osResponsibleId) => setForm({ ...form, osResponsibleId })}
+            />
           </Field>
 
           <Field label="Sanal mı?">
@@ -159,6 +216,14 @@ export function ServerFormPage() {
             />
           </Field>
         </div>
+
+        <Field label="Grup Açıklaması">
+          <input
+            className="input"
+            value={form.groupDesc ?? ''}
+            onChange={(e) => setForm({ ...form, groupDesc: e.target.value })}
+          />
+        </Field>
 
         <Field label="Notlar">
           <textarea
