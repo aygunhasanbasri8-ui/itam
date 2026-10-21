@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tr.com.nkolay.itam.enums.AssetStatus;
+import tr.com.nkolay.itam.model.dto.ExportColumnResponse;
 import tr.com.nkolay.itam.model.dto.PageResponse;
 import tr.com.nkolay.itam.model.dto.WorkstationAssetRequest;
 import tr.com.nkolay.itam.model.dto.WorkstationAssetResponse;
@@ -69,6 +70,11 @@ public class WorkstationAssetController {
     public WorkstationAssetResponse update(@PathVariable Long id,
             @Valid @RequestBody WorkstationAssetRequest request) {
         return workstationAssetService.update(id, request);
+    }
+
+    @GetMapping("/export/columns")
+    public List<ExportColumnResponse> exportColumns() {
+        return workstationExportService.columns();
     }
 
     @GetMapping("/export")

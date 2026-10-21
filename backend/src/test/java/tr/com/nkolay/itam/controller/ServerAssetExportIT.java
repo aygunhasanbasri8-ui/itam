@@ -3,6 +3,7 @@ package tr.com.nkolay.itam.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.ByteArrayInputStream;
@@ -69,6 +70,14 @@ class ServerAssetExportIT extends AbstractIntegrationTest {
             assertThat(header.getCell(1).getStringCellValue()).isEqualTo("Ortam");
             assertThat(header.getCell(2)).isNull();
         }
+    }
+
+    @Test
+    @DisplayName("seçilebilecek kolonlar kod ve başlıklarıyla listeleniyor")
+    void kolonlarListeleniyor() throws Exception {
+        mockMvc.perform(get("/api/v1/servers/export/columns"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.code == 'hostname')].header").value("Hostname"));
     }
 
     @Test
