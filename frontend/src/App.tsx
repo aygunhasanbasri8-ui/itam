@@ -20,6 +20,8 @@ import { PersonListPage } from './pages/people/PersonListPage'
 import { PersonFormPage } from './pages/people/PersonFormPage'
 import { DepartmentListPage } from './pages/departments/DepartmentListPage'
 import { DepartmentFormPage } from './pages/departments/DepartmentFormPage'
+import { UserListPage } from './pages/users/UserListPage'
+import { UserFormPage } from './pages/users/UserFormPage'
 
 const queryClient = new QueryClient()
 
@@ -61,6 +63,9 @@ export default function App() {
               <Route path="/departments/new" element={<DepartmentFormPage />} />
               <Route path="/departments/:id" element={<DepartmentFormPage />} />
               <Route path="/custom-fields" element={<CustomFieldDefinitionsPage />} />
+              <Route path="/users" element={<UserListPage />} />
+              <Route path="/users/new" element={<UserFormPage />} />
+              <Route path="/users/:id" element={<UserFormPage />} />
             </Route>
           </Routes>
         </AuthProvider>
