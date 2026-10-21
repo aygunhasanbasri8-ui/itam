@@ -18,6 +18,10 @@ import tr.com.nkolay.itam.validation.ValidationCollector;
  * <p>
  * V1'de tüm alanlar opsiyonel (ck_custom_field_req), bu yüzden eksik alan hatası
  * üretilmiyor — yalnızca tanımsız anahtar ve yanlış biçim kontrol ediliyor.
+ * <p>
+ * Pasife alınmış tanımlar da geçerli sayılıyor: pasif alan formda gösterilmiyor
+ * ama eski asset'lerde değeri duruyor. Onu reddetseydik, alanı pasife almak o
+ * asset'lerin bir daha kaydedilememesi demek olurdu.
  */
 @Component
 public class CustomFieldValidator {
@@ -34,7 +38,7 @@ public class CustomFieldValidator {
         }
 
         Map<String, CustomFieldDefinition> defsByKey = definitionRepository
-                .findByAssetTypeCodeAndActiveTrueOrderBySortOrder(assetTypeCode).stream()
+                .findByAssetTypeCodeOrderBySortOrder(assetTypeCode).stream()
                 .collect(java.util.stream.Collectors.toMap(CustomFieldDefinition::getFieldKey, d -> d));
 
         for (Map.Entry<String, String> entry : customFields.entrySet()) {

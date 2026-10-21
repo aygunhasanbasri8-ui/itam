@@ -109,6 +109,25 @@ class CustomFieldDefinitionControllerIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.errors[?(@.code == 'tanimsizOzelAlan')]").exists());
     }
 
+    @Test
+    @DisplayName("pasife alınan alanın eski değeri asset'i kaydetmeye engel olmaz")
+    void pasifAlanDegeriKabulEdiliyor() throws Exception {
+        long tanimId = tanimOlustur("SERVER", "eskiEtiket", "Eski Etiket", "TEXT");
+        mockMvc.perform(put("/api/v1/custom-field-definitions/{id}", tanimId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"label": "Eski Etiket", "showInList": false, "active": false, "sortOrder": 0}
+                                """))
+                .andExpect(status().isOk());
+
+        String govde = """
+                {"assetName": "cf-04", "hostname": "cf-04.nkolay.local", "environment": "PROD",
+                 "customFields": {"eskiEtiket": "A-12"}}
+                """;
+        mockMvc.perform(post("/api/v1/servers").contentType(MediaType.APPLICATION_JSON).content(govde))
+                .andExpect(status().isCreated());
+    }
+
     private long tanimOlustur(String assetTypeCode, String fieldKey, String label, String dataType) throws Exception {
         String govde = """
                 {"assetTypeCode": "%s", "fieldKey": "%s", "label": "%s",

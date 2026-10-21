@@ -10,7 +10,5 @@ public interface CustomFieldDefinitionRepository extends JpaRepository<CustomFie
 
     List<CustomFieldDefinition> findByAssetTypeCodeOrderBySortOrder(String assetTypeCode);
 
-    List<CustomFieldDefinition> findByAssetTypeCodeAndActiveTrueOrderBySortOrder(String assetTypeCode);
-
     boolean existsByAssetTypeCodeAndFieldKey(String assetTypeCode, String fieldKey);
 }
