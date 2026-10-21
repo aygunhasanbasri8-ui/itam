@@ -15,6 +15,7 @@ import { ApplicationListPage } from './pages/applications/ApplicationListPage'
 import { ApplicationFormPage } from './pages/applications/ApplicationFormPage'
 import { BusinessServiceListPage } from './pages/business-services/BusinessServiceListPage'
 import { BusinessServiceFormPage } from './pages/business-services/BusinessServiceFormPage'
+import { CustomFieldDefinitionsPage } from './pages/custom-fields/CustomFieldDefinitionsPage'
 
 const queryClient = new QueryClient()
 
@@ -49,6 +50,7 @@ export default function App() {
               <Route path="/business-services" element={<BusinessServiceListPage />} />
               <Route path="/business-services/new" element={<BusinessServiceFormPage />} />
               <Route path="/business-services/:id" element={<BusinessServiceFormPage />} />
+              <Route path="/custom-fields" element={<CustomFieldDefinitionsPage />} />
             </Route>
           </Routes>
         </AuthProvider>

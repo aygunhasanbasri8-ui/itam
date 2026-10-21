@@ -1,0 +1,9 @@
+export type AssetTypeCode = 'SERVER' | 'WORKSTATION' | 'CLOUD' | 'APPLICATION' | 'BUSINESS_SERVICE'
+
+export const ASSET_TYPE_LABELS: Record<AssetTypeCode, string> = {
+  SERVER: 'Sunucu',
+  WORKSTATION: 'İş İstasyonu',
+  CLOUD: 'Cloud Varlığı',
+  APPLICATION: 'Uygulama & Yazılım',
+  BUSINESS_SERVICE: 'İş Servisi',
+}
