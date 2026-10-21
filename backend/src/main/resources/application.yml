@@ -70,4 +70,4 @@ springdoc:
 
 logging:
   level:
-    tr.com.nkolay.itam: INFO
+    com.itam: INFO

@@ -110,7 +110,7 @@ itam/
 ├── backend/          Spring Boot uygulaması
 ├── frontend/         React uygulaması
 ├── docker-compose.yml
-└── docs/             Tasarım raporu ve yol haritası
+└── docs/             Doküman notları
 ```
 
 ### Paket düzeni
@@ -119,7 +119,7 @@ Paketleme **katman önce**. "Sistemde hangi uçlar var, hangi iş kuralları var
 hangi çevrimler var" sorusu tek klasöre bakarak yanıtlanır.
 
 ```
-tr/com/nkolay/itam/
+com/itam/
 ├── config/          açılış yapılandırması, Envers revizyon dinleyicisi
 ├── controller/      REST uçları, @Valid, @PreAuthorize
 ├── service/
@@ -214,4 +214,8 @@ sunucu listeleme endpointi eklendi
 
 **Silme mantıksaldır.** `is_deleted` bayrağı kullanılır; `status = 'RETIRED'` ise farklı bir kavramdır (hizmet dışı ama envanterde).
 
-Ayrıntılar için `docs/ITAM_Tasarim_Raporu.pdf`.
+---
+
+## Lisans
+
+MIT — ayrıntılar için `LICENSE`.

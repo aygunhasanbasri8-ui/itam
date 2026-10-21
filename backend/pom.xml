@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>tr.com.nkolay</groupId>
+    <groupId>com.itam</groupId>
     <artifactId>itam</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <name>itam</name>
