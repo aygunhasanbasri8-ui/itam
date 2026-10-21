@@ -6,7 +6,7 @@ import tr.com.nkolay.itam.model.entity.BusinessServiceAsset;
 import tr.com.nkolay.itam.model.entity.Person;
 
 /** ServerExportColumn ile aynı desen — bkz. oradaki açıklama. */
-public enum BusinessServiceExportColumn {
+public enum BusinessServiceExportColumn implements AssetColumn<BusinessServiceAsset> {
 
     ID("id", "ID", a -> a.getId()),
     ASSET_NAME("assetName", "Ad", BusinessServiceAsset::getAssetName),
@@ -29,14 +29,17 @@ public enum BusinessServiceExportColumn {
         this.valueOf = valueOf;
     }
 
+    @Override
     public String code() {
         return code;
     }
 
+    @Override
     public String header() {
         return header;
     }
 
+    @Override
     public Object valueOf(BusinessServiceAsset asset) {
         return valueOf.apply(asset);
     }

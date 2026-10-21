@@ -6,7 +6,7 @@ import tr.com.nkolay.itam.model.entity.ApplicationAsset;
 import tr.com.nkolay.itam.model.entity.Person;
 
 /** ServerExportColumn ile aynı desen — bkz. oradaki açıklama. */
-public enum ApplicationExportColumn {
+public enum ApplicationExportColumn implements AssetColumn<ApplicationAsset> {
 
     ID("id", "ID", a -> a.getId()),
     ASSET_NAME("assetName", "Ad", ApplicationAsset::getAssetName),
@@ -32,14 +32,17 @@ public enum ApplicationExportColumn {
         this.valueOf = valueOf;
     }
 
+    @Override
     public String code() {
         return code;
     }
 
+    @Override
     public String header() {
         return header;
     }
 
+    @Override
     public Object valueOf(ApplicationAsset asset) {
         return valueOf.apply(asset);
     }

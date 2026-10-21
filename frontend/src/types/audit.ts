@@ -1,5 +1,6 @@
 export interface FieldChange {
   field: string
+  label: string
   oldValue: string | null
   newValue: string | null
 }
