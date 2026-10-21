@@ -1,4 +1,5 @@
 import { apiClient } from './client'
+import type { AssetSummary } from './assetSearch'
 
 export interface DashboardSummary {
   totalAssets: number
@@ -7,6 +8,7 @@ export interface DashboardSummary {
   countByEnvironment: Record<string, number>
   licensesExpiringSoon: number
   licensesExpired: number
+  recentAssets: AssetSummary[]
 }
 
 export async function getDashboardSummary(expiringSoonDays = 30): Promise<DashboardSummary> {

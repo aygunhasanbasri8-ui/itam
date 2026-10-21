@@ -7,6 +7,7 @@ export interface AssetSummary {
   assetName: string
   assetTypeCode: AssetTypeCode
   status: AssetStatus
+  createdAt: string
 }
 
 export async function searchAssets(q: string, limit = 20): Promise<AssetSummary[]> {
