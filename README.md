@@ -50,6 +50,18 @@ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 
 İlk açılışta Flyway `V1__init_schema.sql` dosyasını uygular ve 13 tabloyu oluşturur.
 
+`dev` profili repodaki varsayılan JWT anahtarını ve seed edilen `admin` / `admin123`
+kullanıcısını olduğu gibi kullanır; bu ikisi yalnızca yerel geliştirme ve testler içindir.
+
+### Üretimde çalıştırma
+
+`dev` ya da `test` profili açık değilse uygulama açılışta şunları ister, eksikse hata verip durur:
+
+| Ortam değişkeni | Açıklama |
+|---|---|
+| `JWT_SECRET` | En az 32 byte rastgele değer (ör. `openssl rand -base64 48`). Boş ya da geliştirme anahtarıyla aynı olamaz. |
+| `ADMIN_INITIAL_PASSWORD` | `admin` kullanıcısının şifresi hâlâ `admin123` iken zorunlu (en az 8 karakter). İlk açılışta şifre bununla değiştirilir; sonraki açılışlarda verilmesine gerek yoktur. |
+
 ### 3. Doğrula
 
 | Adres | Beklenen |
@@ -85,7 +97,7 @@ npm install
 npm run dev
 ```
 
-`http://localhost:5173` — giriş: `admin` / `admin123`. Dev sunucusu `/api` isteklerini
+`http://localhost:5173` — yerelde (`dev` profili) giriş: `admin` / `admin123`. Dev sunucusu `/api` isteklerini
 otomatik olarak backend'e (8080) proxy'ler, ayrıca CORS ayarı gerekmez. Ayrıntılar için
 `frontend/README.md`.
 
