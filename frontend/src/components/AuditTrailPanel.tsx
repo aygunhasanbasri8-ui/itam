@@ -10,6 +10,15 @@ const FIELD_LABELS: Record<string, string> = {
   assetType: 'Asset tipi',
 }
 
+const CUSTOM_FIELD_PREFIX = 'customFields.'
+
+function fieldLabel(field: string): string {
+  if (field.startsWith(CUSTOM_FIELD_PREFIX)) {
+    return `Özel alan: ${field.slice(CUSTOM_FIELD_PREFIX.length)}`
+  }
+  return FIELD_LABELS[field] ?? field
+}
+
 const REVISION_LABELS: Record<string, string> = {
   ADD: 'Oluşturuldu',
   MOD: 'Güncellendi',
@@ -51,7 +60,7 @@ export function AuditTrailPanel({ assetId }: { assetId: number }) {
                   <tbody>
                     {revision.changes.map((change) => (
                       <tr key={change.field} className="border-t border-slate-100">
-                        <td className="w-40 py-1 text-slate-500">{FIELD_LABELS[change.field] ?? change.field}</td>
+                        <td className="w-40 py-1 text-slate-500">{fieldLabel(change.field)}</td>
                         <td className="py-1 text-slate-400 line-through">{change.oldValue ?? '—'}</td>
                         <td className="py-1 text-slate-700">{change.newValue ?? '—'}</td>
                       </tr>
