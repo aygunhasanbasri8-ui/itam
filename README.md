@@ -2,6 +2,8 @@
 
 English | [Türkçe](README.tr.md)
 
+[![CI](https://github.com/aygunhasanbasri8-ui/itam/actions/workflows/ci.yml/badge.svg)](https://github.com/aygunhasanbasri8-ui/itam/actions/workflows/ci.yml)
+
 An inventory management system that tracks all of an organization's hardware, software and business-service assets in one place, built with auditability in mind.
 
 **Status:** Backend phases 0-6 are complete (CRUD, authentication, user management, dependency map, audit trail, custom fields, dashboard). The frontend already has list/form screens for the 5 asset types (bulk status update, Excel export, custom fields, dependency and change-history panels), person/department/user management and custom field definitions. Excel import (phase 7) is not implemented yet.
@@ -102,6 +104,8 @@ Frontend commands:
 npm run build   # tsc -b && vite build
 npm run lint    # oxlint
 ```
+
+GitHub Actions runs `mvn verify` (including the Testcontainers integration tests) and the frontend lint + build on every push to `main` and on pull requests; Dependabot watches Maven, npm and the workflow actions.
 
 ---
 

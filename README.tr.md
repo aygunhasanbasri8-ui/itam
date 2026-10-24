@@ -2,6 +2,8 @@
 
 [English](README.md) | Türkçe
 
+[![CI](https://github.com/aygunhasanbasri8-ui/itam/actions/workflows/ci.yml/badge.svg)](https://github.com/aygunhasanbasri8-ui/itam/actions/workflows/ci.yml)
+
 Kurum bünyesindeki tüm donanım, yazılım ve iş servisi varlıklarının tek merkezden yönetildiği, denetim standartlarına uygun envanter yönetim sistemi.
 
 **Durum:** Backend Faz 0-6 tamamlandı (CRUD, kimlik doğrulama, kullanıcı yönetimi, bağımlılık haritası, denetim izi, custom field, dashboard). Frontend'de 5 asset tipinin liste/form ekranları (toplu durum güncelleme, Excel'e aktarma, özel alanlar, bağımlılık ve değişiklik geçmişi panelleri), kişi/departman/kullanıcı yönetimi ve özel alan tanımları hazır. Excel'den içe aktarma (Faz 7) henüz yok.
@@ -103,6 +105,8 @@ Frontend komutları:
 npm run build   # tsc -b && vite build
 npm run lint    # oxlint
 ```
+
+GitHub Actions, `main`'e her push'ta ve pull request'lerde `mvn verify`'ı (Testcontainers entegrasyon testleri dahil) ve frontend lint + build'i çalıştırıyor; Dependabot Maven, npm ve iş akışı eylemlerini izliyor.
 
 ---
 
