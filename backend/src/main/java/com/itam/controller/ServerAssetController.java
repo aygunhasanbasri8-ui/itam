@@ -31,7 +31,7 @@ import com.itam.model.dto.ServerAssetRequest;
 import com.itam.model.dto.ServerAssetResponse;
 import com.itam.service.asset.ServerAssetService;
 import com.itam.service.export.ServerExportService;
-import com.itam.service.importer.ServerImportService;
+import com.itam.service.importer.AssetImportService;
 
 import jakarta.validation.Valid;
 
@@ -44,10 +44,10 @@ public class ServerAssetController {
 
     private final ServerAssetService serverAssetService;
     private final ServerExportService serverExportService;
-    private final ServerImportService serverImportService;
+    private final AssetImportService<ServerAssetRequest> serverImportService;
 
     public ServerAssetController(ServerAssetService serverAssetService,
-            ServerExportService serverExportService, ServerImportService serverImportService) {
+            ServerExportService serverExportService, AssetImportService<ServerAssetRequest> serverImportService) {
         this.serverAssetService = serverAssetService;
         this.serverExportService = serverExportService;
         this.serverImportService = serverImportService;

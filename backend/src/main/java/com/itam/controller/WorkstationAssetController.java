@@ -1,6 +1,8 @@
 package com.itam.controller;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -18,14 +20,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.itam.enums.AssetStatus;
 import com.itam.model.dto.ExportColumnResponse;
+import com.itam.model.dto.ImportReport;
 import com.itam.model.dto.PageResponse;
 import com.itam.model.dto.WorkstationAssetRequest;
 import com.itam.model.dto.WorkstationAssetResponse;
 import com.itam.service.asset.WorkstationAssetService;
 import com.itam.service.export.WorkstationExportService;
+import com.itam.service.importer.AssetImportService;
 
 import jakarta.validation.Valid;
 
@@ -38,11 +43,14 @@ public class WorkstationAssetController {
 
     private final WorkstationAssetService workstationAssetService;
     private final WorkstationExportService workstationExportService;
+    private final AssetImportService<WorkstationAssetRequest> importService;
 
     public WorkstationAssetController(WorkstationAssetService workstationAssetService,
-            WorkstationExportService workstationExportService) {
+            WorkstationExportService workstationExportService,
+            AssetImportService<WorkstationAssetRequest> importService) {
         this.workstationAssetService = workstationAssetService;
         this.workstationExportService = workstationExportService;
+        this.importService = importService;
     }
 
     @GetMapping
@@ -95,6 +103,25 @@ public class WorkstationAssetController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=is-istasyonlari.xlsx")
+                .contentType(XLSX_MEDIA_TYPE)
+                .body(out.toByteArray());
+    }
+
+    /** Sunucu içe aktarmasıyla aynı akış: önce dryRun=true ile kontrol, sonra yazma. */
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ImportReport importXlsx(@RequestParam("file") MultipartFile file,
+            @RequestParam(defaultValue = "true") boolean dryRun) throws IOException {
+        try (InputStream in = file.getInputStream()) {
+            return importService.importXlsx(in, dryRun);
+        }
+    }
+
+    @GetMapping("/import/template")
+    public ResponseEntity<byte[]> importTemplate() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        importService.writeTemplate(out);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=is-istasyonu-ice-aktarma-sablonu.xlsx")
                 .contentType(XLSX_MEDIA_TYPE)
                 .body(out.toByteArray());
     }
