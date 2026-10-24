@@ -1,7 +1,9 @@
 package com.itam.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -15,4 +17,8 @@ public interface ApplicationAssetRepository
 
     /** Dashboard'daki "süresi yaklaşan lisanslar" sayacı için; iki sınır da dahil. */
     long countByDeletedFalseAndExpiryDateBetween(LocalDate start, LocalDate end);
+
+    /** Bitiş bildirimleri için; sorumlunun e-postası da gerektiği için birlikte yükleniyor. */
+    @EntityGraph(attributePaths = "responsibilityOwner")
+    List<ApplicationAsset> findByDeletedFalseAndExpiryDateBetween(LocalDate start, LocalDate end);
 }

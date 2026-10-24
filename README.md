@@ -19,6 +19,7 @@ An inventory management system that tracks all of an organization's hardware, so
 - **Bulk status update**, search and filtering (owner, license expiry, etc.).
 - **Excel export:** per asset type, with column selection.
 - **Excel import (servers):** `POST /api/v1/servers/import?dryRun=true|false` with the same headers as the export (an exported file can be edited and sent back; the title block on top is skipped). The file is checked first and a row-by-row error report comes back; if any row is invalid nothing is written. People can be given by employee code, e-mail or full name. Duplicate hostnames (in the file or among live servers) are rejected. Up to 5000 rows; `GET /api/v1/servers/import/template` returns an empty template. On the server list page: **Excel'den içe aktar** (admin only).
+- **License expiry notifications:** an hourly job looks at application licenses (`expiryDate`) and sends one notice 30, 7 and 1 days before expiry (`itam.notifications.license-expiry.days-before`) to a webhook (`ITAM_LICENSE_NOTIFY_WEBHOOK_URL`, JSON with a Slack/Teams-friendly `text` field) and/or by e-mail (`ITAM_LICENSE_NOTIFY_EMAIL_TO`, plus the license owner; needs `spring.mail.*`). Sent notices are stored (`license_expiry_notice`, V11), so a restart or a second instance does not repeat them and hours the app was down are caught up. A license added with 5 days left gets a single notice, not a burst for every threshold it already passed. With no channel configured the job does nothing.
 - **Dashboard:** counts by type, status and environment; licenses that are expired or about to expire; recently added assets.
 - **Person, department and user management:** JWT login with two roles: `ADMIN` has full access, `USER` can only view, filter and export.
 - **Soft delete** and mandatory owner assignment (see [Data Model Notes](#data-model-notes)).
@@ -69,7 +70,7 @@ cd backend
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-On first start Flyway applies all migrations from `V1` to `V10`: 13 core tables plus the Envers audit tables (`*_aud`).
+On first start Flyway applies all migrations from `V1` to `V11`: 13 core tables plus the Envers audit tables (`*_aud`).
 
 The `dev` profile uses the default JWT secret from the repo and the seeded `admin` / `admin123`
 user as they are; both are meant only for local development and tests.
