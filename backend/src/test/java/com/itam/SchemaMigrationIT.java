@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 @DisplayName("V1 şema migration")
 class SchemaMigrationIT extends AbstractIntegrationTest {
@@ -79,8 +80,11 @@ class SchemaMigrationIT extends AbstractIntegrationTest {
 	}
 
 	@Test
+	@Transactional
 	@DisplayName("geçersiz enum değeri veritabanı seviyesinde reddediliyor")
 	void gecersizEnumReddediliyor() {
+		// Transaction'sız çalışınca server_asset'i olmayan SERVER satırı (9001) paylaşılan
+		// veritabanında kalıyor, sonraki testlerde "son eklenenler" sorgusu ona çarpıyordu.
 		jdbc.update("INSERT INTO base_asset (id, asset_name, asset_kind, asset_type, "
 				+ "responsibility_owner_id) VALUES (9001, 'test', 'SERVER', 'SERVER', 1)");
 
