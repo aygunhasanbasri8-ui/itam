@@ -1,0 +1,263 @@
+# Kurumsal IT Asset Management (ITAM) Sistemi
+
+[English](README.md) | Türkçe
+
+Kurum bünyesindeki tüm donanım, yazılım ve iş servisi varlıklarının tek merkezden yönetildiği, denetim standartlarına uygun envanter yönetim sistemi.
+
+**Durum:** Backend Faz 0-6 tamamlandı (CRUD, kimlik doğrulama, kullanıcı yönetimi, bağımlılık haritası, denetim izi, custom field, dashboard). Frontend'de 5 asset tipinin liste/form ekranları (toplu durum güncelleme, Excel'e aktarma, özel alanlar, bağımlılık ve değişiklik geçmişi panelleri), kişi/departman/kullanıcı yönetimi ve özel alan tanımları hazır. Excel'den içe aktarma (Faz 7) henüz yok.
+
+---
+
+## Özellikler
+
+- **Beş çekirdek varlık tipi:** sunucu, iş istasyonu, cloud kaynağı, uygulama/yazılım ve iş servisi. Yönetici arayüzden yeni tip de tanımlayabilir.
+- **Bağımlılık haritası:** varlıklar arası bağımlılıklar ve ağaç görünümü ("bu varlığa kimler bağlı").
+- **Denetim izi:** Hibernate Envers ile her varlığın değişiklik geçmişi; silme anında da kaydın içeriği saklanır.
+- **Özel alanlar:** yöneticinin tanımladığı alanlar form, liste ve dışa aktarımda görünür.
+- **Toplu durum güncelleme**, arama ve filtreleme (sorumlu, lisans bitiş tarihi vb.).
+- **Excel'e aktarma:** tipe göre dışa aktarım, kolon seçimiyle.
+- **Dashboard:** tip, durum ve ortama göre sayılar; süresi dolan ya da dolmak üzere olan lisanslar; son eklenen varlıklar.
+- **Kişi, departman ve kullanıcı yönetimi:** JWT ile giriş, iki rol: `ADMIN` tam yetkili, `USER` yalnızca görüntüleme, filtreleme ve dışa aktarım yapabilir.
+- **Mantıksal silme** ve sorumlu ataması zorunluluğu (bkz. [Veri Modeli Notları](#veri-modeli-notları)).
+- **Üretim koruması:** varsayılan JWT anahtarı ya da varsayılan admin şifresiyle üretimde açılış engellenir.
+
+---
+
+## Yığın
+
+| Katman | Teknoloji |
+|---|---|
+| Backend | Java 21, Spring Boot 3.5.16 |
+| Veritabanı | PostgreSQL 16 |
+| Şema yönetimi | Flyway |
+| Denetim izi | Hibernate Envers |
+| API dokümantasyonu | springdoc-openapi (Swagger UI) |
+| Frontend | React 19 + TypeScript + Vite, TanStack Query, Tailwind CSS |
+
+---
+
+## Hızlı Başlangıç
+
+### Gereksinimler
+
+- JDK 21
+- Maven 3.9+
+- Docker ve Docker Compose
+- Node.js ve npm (frontend için)
+
+### 1. Veritabanını başlat
+
+```bash
+docker compose up -d
+```
+
+Hazır olduğunu doğrula:
+
+```bash
+docker compose ps
+```
+
+`STATUS` sütununda `healthy` görünmeli.
+
+### 2. Backend'i çalıştır
+
+```bash
+cd backend
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+İlk açılışta Flyway `V1`'den `V9`'a kadar tüm migration'ları uygular: 13 çekirdek tablo ve Envers denetim tabloları (`*_aud`) oluşur.
+
+`dev` profili repodaki varsayılan JWT anahtarını ve seed edilen `admin` / `admin123`
+kullanıcısını olduğu gibi kullanır; bu ikisi yalnızca yerel geliştirme ve testler içindir.
+
+### 3. Doğrula
+
+| Adres | Beklenen |
+|---|---|
+| http://localhost:8080/actuator/health | `{"status":"UP"}` |
+| http://localhost:8080/swagger-ui.html | Swagger arayüzü |
+| http://localhost:8080/v3/api-docs | OpenAPI JSON |
+
+Veritabanını doğrudan kontrol etmek için:
+
+```bash
+docker exec -it itam-postgres psql -U itam -d itam -c "\dt"
+```
+
+### 4. Frontend'i çalıştır
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+`http://localhost:5173` — yerelde (`dev` profili) giriş: `admin` / `admin123`. Dev sunucusu `/api` isteklerini
+otomatik olarak backend'e (8080) proxy'ler, ayrıca CORS ayarı gerekmez. Ayrıntılar için
+`frontend/README.md`.
+
+Frontend komutları:
+
+```bash
+npm run build   # tsc -b && vite build
+npm run lint    # oxlint
+```
+
+---
+
+## Yapılandırma
+
+Backend ayarları `backend/src/main/resources/application.yml` içindedir ve şu ortam değişkenleriyle ezilebilir:
+
+| Ortam değişkeni | Varsayılan | Açıklama |
+|---|---|---|
+| `DB_URL` | `jdbc:postgresql://localhost:5432/itam` | JDBC adresi |
+| `DB_USER` | `itam` | Veritabanı kullanıcısı |
+| `DB_PASSWORD` | `itam` | Veritabanı şifresi |
+| `JWT_SECRET` | yalnızca geliştirme anahtarı | HS256 için en az 32 byte |
+| `JWT_EXPIRATION_MINUTES` | `480` | Token geçerlilik süresi (dakika) |
+| `ADMIN_INITIAL_PASSWORD` | yok | Aşağıya bak |
+
+### Üretimde çalıştırma
+
+`dev` ya da `test` profili açık değilse uygulama açılışta şunları ister, eksikse hata verip durur:
+
+| Ortam değişkeni | Açıklama |
+|---|---|
+| `JWT_SECRET` | En az 32 byte rastgele değer (ör. `openssl rand -base64 48`). Boş ya da geliştirme anahtarıyla aynı olamaz. |
+| `ADMIN_INITIAL_PASSWORD` | `admin` kullanıcısının şifresi hâlâ `admin123` iken zorunlu (en az 8 karakter). İlk açılışta şifre bununla değiştirilir; sonraki açılışlarda verilmesine gerek yoktur. |
+
+---
+
+## Test
+
+```bash
+cd backend
+mvn verify
+```
+
+Integration test'ler Testcontainers ile kendi PostgreSQL konteynerini ayağa kaldırır; `docker compose` çalışıyor olmasa da testler geçer. Docker daemon'ın erişilebilir olması yeterlidir.
+
+`*IT.java` ile biten sınıflar failsafe tarafından `verify` aşamasında, `*Test.java` ile bitenler surefire tarafından `test` aşamasında çalışır.
+
+Şu an repoda CI iş akışı ve frontend testi yok.
+
+---
+
+## Proje Yapısı
+
+```
+itam/
+├── backend/          Spring Boot uygulaması
+├── frontend/         React uygulaması
+├── docker-compose.yml
+└── docs/             Doküman notları
+```
+
+### Paket düzeni
+
+Paketleme **katman önce**. "Sistemde hangi uçlar var, hangi iş kuralları var,
+hangi çevrimler var" sorusu tek klasöre bakarak yanıtlanır.
+
+```
+com/itam/
+├── config/          açılış yapılandırması, Envers revizyon dinleyicisi
+├── controller/      REST uçları, @Valid, @PreAuthorize
+├── service/
+│   └── <modül>/     asset, person, export ...
+│       ├── XxxService          arayüz — dışarısı yalnızca bunu görür
+│       └── impl/XxxServiceImpl @Service, gerçekleştirim
+├── repository/      Spring Data arayüzleri
+│   └── spec/        filtreleri Specification'a çeviren yardımcılar
+├── mapper/          entity ↔ DTO çevrimi
+├── model/
+│   ├── entity/      JPA sınıfları
+│   └── dto/         request / response record'ları
+├── enums/           AssetStatus, AssetKind, UserRole ...
+├── exception/       GlobalExceptionHandler + özel exception'lar
+├── validation/      özel constraint'ler ve ValidationCollector
+└── security/        JWT, UserDetails, SecurityConfig (Faz 4)
+```
+
+Katman-önce düzenin bedeli, hiçbir sınıfın package-private kalamamasıdır:
+`ServerService` ile `ServerRepository` farklı paketlerde olduğu için repository
+`public` olmak zorunda ve derleyici kimin ona uzandığını denetleyemez.
+
+Bu yüzden zincir `ArchitectureTest` ile korunur. Kaynak dosyaların import
+satırlarını okur, ek bağımlılık gerektirmez. Kural şudur: **ölçülemeyen kural
+kural değildir.**
+
+| Kural | Gerekçe |
+|---|---|
+| Repository'ye yalnızca servis ve güvenlik dokunur | Bir tablonun okunma kuralı iki yerde yaşamasın |
+| Controller yalnızca servis arayüzüne konuşur | Servisin içi değişince controller açılmasın |
+| Servis web tiplerini görmez | Servis HTTP dışından da çağrılabilsin |
+| Mapper veriye ve iş kuralına uzanmaz | Çevrim saf kalsın |
+| DTO entity'ye bağımlı olmaz | Şema değişikliği API sözleşmesini habersiz kırmasın |
+| Java kaynağında DDL geçmez | Şema yalnızca Flyway'in |
+
+Son kural, entity'den DTO üreten `static from()` desenini de yasaklar; çevrim
+`mapper/` katmanında yapılır.
+
+---
+
+## Geliştirme Kuralları
+
+### Şema değişikliği
+
+Şemaya Hibernate **dokunmaz** (`ddl-auto: none`). Her değişiklik yeni bir Flyway migration dosyası olarak eklenir:
+
+```
+V10__aciklayici_isim.sql
+V11__baska_bir_degisiklik.sql
+```
+
+Uygulanmış bir migration dosyası **asla düzenlenmez** — Flyway checksum doğrulaması yapar ve uygulama açılmaz.
+
+PostgreSQL enum tipine değer eklerken migration dosyasının başına şu satır konulmalıdır:
+
+```sql
+-- flyway:executeInTransaction=false
+```
+
+`ALTER TYPE ... ADD VALUE` ile eklenen değer aynı transaction içinde kullanılamaz.
+
+### Kimlik üretimi
+
+Tüm sequence'ler `INCREMENT BY 50` ile tanımlıdır. Entity tarafında `allocationSize` da **50 olmalıdır**:
+
+```java
+@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "base_asset_seq")
+@SequenceGenerator(name = "base_asset_seq", sequenceName = "base_asset_seq",
+                   allocationSize = 50)
+```
+
+`GenerationType.IDENTITY` kullanılmaz — JDBC batch insert'i devre dışı bırakır ve Faz 7'deki Excel içe aktarımını yavaşlatır.
+
+### Branch ve commit
+
+- `main` — sağlam durumu temsil eder (derleme + testler yeşil)
+- `feature/<konu>` — her iş için ayrı dal, yeşilse `main`'e `--no-ff` merge edilir
+
+Commit mesajı: tek satır, Türkçe, emir kipi.
+
+```
+sunucu listeleme endpointi eklendi
+```
+
+---
+
+## Veri Modeli Notları
+
+**`asset_kind` ve `asset_type` ayrımı.** `asset_kind` JPA kalıtım ayırt edici kolonudur ve kapalı bir enum kümesidir. `asset_type` ise kullanıcının gördüğü tiptir ve `asset_type_def` tablosuna referans verir — yönetici arayüzden yeni tip ekleyebildiği için dinamiktir. Çekirdek beş tipte iki kolon aynı değeri taşır; yönetici tanımlı tiplerde `asset_kind = 'GENERIC'` olur.
+
+**Sorumlu ataması zorunludur.** `base_asset.responsibility_owner_id` NOT NULL'dır. Kullanıcı sorumlu seçmezse servis katmanı `code = 'FIRMA'` olan sistem kaydını atar. Bu kayıt silinemez.
+
+**Silme mantıksaldır.** `is_deleted` bayrağı kullanılır; `status = 'RETIRED'` ise farklı bir kavramdır (hizmet dışı ama envanterde).
+
+---
+
+## Lisans
+
+MIT — ayrıntılar için [`LICENSE`](LICENSE).
