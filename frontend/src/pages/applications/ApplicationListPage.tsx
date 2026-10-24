@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useIsAdmin } from '../../auth/useIsAdmin'
 import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { ExportButton } from '../../components/ExportButton'
+import { ImportButton } from '../../components/ImportButton'
 import { OwnerFilter } from '../../components/OwnerFilter'
 import { useSelection } from '../../hooks/useSelection'
 import { formatCustomFieldValue, useListCustomFields } from '../../hooks/useListCustomFields'
@@ -49,6 +50,7 @@ export function ApplicationListPage() {
               responsibilityOwnerId: ownerId || undefined,
             }}
           />
+          {isAdmin && <ImportButton path="/applications/import" queryKey="applications" />}
           {isAdmin && (
             <Link to="/applications/new" className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white">
               Yeni Uygulama
