@@ -106,9 +106,10 @@ Frontend komutları:
 ```bash
 npm run build   # tsc -b && vite build
 npm run lint    # oxlint
+npm test        # Vitest + Testing Library (jsdom)
 ```
 
-GitHub Actions, `main`'e her push'ta ve pull request'lerde `mvn verify`'ı (Testcontainers entegrasyon testleri dahil) ve frontend lint + build'i çalıştırıyor; Dependabot Maven, npm ve iş akışı eylemlerini izliyor.
+GitHub Actions, `main`'e her push'ta ve pull request'lerde `mvn verify`'ı (Testcontainers entegrasyon testleri dahil) ve frontend lint, test ve build'i çalıştırıyor; Dependabot Maven, npm ve iş akışı eylemlerini izliyor.
 
 ---
 

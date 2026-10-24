@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { getDashboardSummary } from '../api/dashboard'
-import { ASSET_TYPE_LABELS, ASSET_TYPE_ROUTES } from '../types/assetType'
+import { useAssetTypes } from '../hooks/useAssetTypeLabels'
+import { ASSET_TYPE_ROUTES } from '../types/assetType'
 import { ASSET_STATUS_LABELS } from '../types/common'
 import { Link } from 'react-router-dom'
 
@@ -44,6 +45,7 @@ function DistributionCard({ title, data, labels }: { title: string; data: Record
 }
 
 export function DashboardPage() {
+  const { labels: assetTypeLabels } = useAssetTypes()
   const { data, isLoading, isError } = useQuery({
     queryKey: ['dashboard-summary'],
     queryFn: () => getDashboardSummary(30),
@@ -80,7 +82,7 @@ export function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <DistributionCard title="Asset Tipi Dağılımı" data={data.countByAssetType} labels={ASSET_TYPE_LABELS} />
+        <DistributionCard title="Asset Tipi Dağılımı" data={data.countByAssetType} labels={assetTypeLabels} />
         <DistributionCard title="Durum Dağılımı" data={data.countByStatus} labels={ASSET_STATUS_LABELS} />
         <DistributionCard title="Sunucu Ortam Dağılımı" data={data.countByEnvironment} />
       </div>
@@ -100,7 +102,7 @@ export function DashboardPage() {
                   {asset.assetName}
                 </Link>
                 <span className="text-slate-500">
-                  {ASSET_TYPE_LABELS[asset.assetTypeCode]} · {new Date(asset.createdAt).toLocaleDateString('tr-TR')}
+                  {assetTypeLabels[asset.assetTypeCode]} · {new Date(asset.createdAt).toLocaleDateString('tr-TR')}
                 </span>
               </li>
             ))}

@@ -8,6 +8,7 @@ import {
 import { extractErrorMessage } from '../../api/client'
 import { useIsAdmin } from '../../auth/useIsAdmin'
 import { Field } from '../../components/Field'
+import { useAssetTypes } from '../../hooks/useAssetTypeLabels'
 import { ASSET_TYPE_LABELS, type AssetTypeCode } from '../../types/assetType'
 import type {
   CustomFieldDefinition,
@@ -23,6 +24,7 @@ const DATA_TYPE_LABELS: Record<CustomFieldType, string> = {
 }
 
 export function CustomFieldDefinitionsPage() {
+  const { labels: assetTypeLabels } = useAssetTypes()
   const [assetType, setAssetType] = useState<AssetTypeCode>('SERVER')
   const canEdit = useIsAdmin()
 
@@ -40,9 +42,9 @@ export function CustomFieldDefinitionsPage() {
           value={assetType}
           onChange={(e) => setAssetType(e.target.value as AssetTypeCode)}
         >
-          {Object.entries(ASSET_TYPE_LABELS).map(([code, label]) => (
+          {Object.keys(ASSET_TYPE_LABELS).map((code) => (
             <option key={code} value={code}>
-              {label}
+              {assetTypeLabels[code]}
             </option>
           ))}
         </select>
@@ -189,6 +191,7 @@ function DefinitionRow({ definition, canEdit }: { definition: CustomFieldDefinit
 }
 
 function NewDefinitionForm({ assetType }: { assetType: AssetTypeCode }) {
+  const { labels: assetTypeLabels } = useAssetTypes()
   const queryClient = useQueryClient()
   const emptyForm: CustomFieldDefinitionRequest = {
     assetTypeCode: assetType,
@@ -218,7 +221,7 @@ function NewDefinitionForm({ assetType }: { assetType: AssetTypeCode }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-slate-200 bg-white p-6">
-      <h2 className="text-lg font-semibold text-slate-800">Yeni özel alan — {ASSET_TYPE_LABELS[assetType]}</h2>
+      <h2 className="text-lg font-semibold text-slate-800">Yeni özel alan — {assetTypeLabels[assetType]}</h2>
       <div className="grid grid-cols-2 gap-4">
         <Field label="Anahtar" required>
           <input
