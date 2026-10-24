@@ -10,6 +10,12 @@ spring:
       maximum-pool-size: 10
       pool-name: itam-pool
 
+  servlet:
+    multipart:
+      # Excel içe aktarma; 5000 satırlık bir dosya birkaç MB'ı geçmiyor
+      max-file-size: 10MB
+      max-request-size: 10MB
+
   jpa:
     hibernate:
       # Semayi yalnizca Flyway yonetir. validate, entity ile migration'in

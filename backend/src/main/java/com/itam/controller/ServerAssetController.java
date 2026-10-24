@@ -1,6 +1,8 @@
 package com.itam.controller;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -18,15 +20,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.itam.enums.AssetStatus;
 import com.itam.enums.ServerEnvironment;
 import com.itam.model.dto.ExportColumnResponse;
+import com.itam.model.dto.ImportReport;
 import com.itam.model.dto.PageResponse;
 import com.itam.model.dto.ServerAssetRequest;
 import com.itam.model.dto.ServerAssetResponse;
 import com.itam.service.asset.ServerAssetService;
 import com.itam.service.export.ServerExportService;
+import com.itam.service.importer.ServerImportService;
 
 import jakarta.validation.Valid;
 
@@ -39,11 +44,13 @@ public class ServerAssetController {
 
     private final ServerAssetService serverAssetService;
     private final ServerExportService serverExportService;
+    private final ServerImportService serverImportService;
 
     public ServerAssetController(ServerAssetService serverAssetService,
-            ServerExportService serverExportService) {
+            ServerExportService serverExportService, ServerImportService serverImportService) {
         this.serverAssetService = serverAssetService;
         this.serverExportService = serverExportService;
+        this.serverImportService = serverImportService;
     }
 
     @GetMapping
@@ -102,6 +109,29 @@ public class ServerAssetController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sunucular.xlsx")
+                .contentType(XLSX_MEDIA_TYPE)
+                .body(out.toByteArray());
+    }
+
+    /**
+     * Excel'den toplu sunucu ekleme. Varsayılan dryRun=true: önce yalnızca kontrol
+     * edilir, kullanıcı raporu görüp onaylayınca aynı dosya dryRun=false ile gönderilir.
+     * Hatalı satır varsa hiçbir kayıt yazılmaz; yanıt yine 200, hatalar raporda.
+     */
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ImportReport importXlsx(@RequestParam("file") MultipartFile file,
+            @RequestParam(defaultValue = "true") boolean dryRun) throws IOException {
+        try (InputStream in = file.getInputStream()) {
+            return serverImportService.importXlsx(in, dryRun);
+        }
+    }
+
+    @GetMapping("/import/template")
+    public ResponseEntity<byte[]> importTemplate() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        serverImportService.writeTemplate(out);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sunucu-ice-aktarma-sablonu.xlsx")
                 .contentType(XLSX_MEDIA_TYPE)
                 .body(out.toByteArray());
     }
