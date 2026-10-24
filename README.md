@@ -66,7 +66,7 @@ cd backend
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-On first start Flyway applies all migrations from `V1` to `V9`: 13 core tables plus the Envers audit tables (`*_aud`).
+On first start Flyway applies all migrations from `V1` to `V10`: 13 core tables plus the Envers audit tables (`*_aud`).
 
 The `dev` profile uses the default JWT secret from the repo and the seeded `admin` / `admin123`
 user as they are; both are meant only for local development and tests.
@@ -255,7 +255,7 @@ sunucu listeleme endpointi eklendi
 
 **An owner is mandatory.** `base_asset.responsibility_owner_id` is NOT NULL. If the user does not pick an owner, the service layer assigns the system record with `code = 'FIRMA'`. That record cannot be deleted.
 
-**Deletion is logical.** The `is_deleted` flag is used; `status = 'RETIRED'` is a different concept (out of service but still in the inventory).
+**Deletion is logical.** The `is_deleted` flag is used; `status = 'RETIRED'` is a different concept (out of service but still in the inventory). A deleted server's hostname and a deleted workstation's serial number no longer block a new record with the same value: the unique indexes only cover live rows (`V10` keeps a copy of the flag on the subtype tables via a trigger).
 
 ---
 

@@ -66,7 +66,7 @@ cd backend
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-İlk açılışta Flyway `V1`'den `V9`'a kadar tüm migration'ları uygular: 13 çekirdek tablo ve Envers denetim tabloları (`*_aud`) oluşur.
+İlk açılışta Flyway `V1`'den `V10`'a kadar tüm migration'ları uygular: 13 çekirdek tablo ve Envers denetim tabloları (`*_aud`) oluşur.
 
 `dev` profili repodaki varsayılan JWT anahtarını ve seed edilen `admin` / `admin123`
 kullanıcısını olduğu gibi kullanır; bu ikisi yalnızca yerel geliştirme ve testler içindir.
@@ -254,7 +254,7 @@ sunucu listeleme endpointi eklendi
 
 **Sorumlu ataması zorunludur.** `base_asset.responsibility_owner_id` NOT NULL'dır. Kullanıcı sorumlu seçmezse servis katmanı `code = 'FIRMA'` olan sistem kaydını atar. Bu kayıt silinemez.
 
-**Silme mantıksaldır.** `is_deleted` bayrağı kullanılır; `status = 'RETIRED'` ise farklı bir kavramdır (hizmet dışı ama envanterde).
+**Silme mantıksaldır.** `is_deleted` bayrağı kullanılır; `status = 'RETIRED'` ise farklı bir kavramdır (hizmet dışı ama envanterde). Silinen sunucunun hostname'i ve silinen iş istasyonunun seri numarası aynı değerle yeni kayıt açılmasını engellemez: tekil indeksler yalnızca canlı kayıtları kapsar (`V10`, bayrağın bir kopyasını tetikleyiciyle alt tablolarda tutar).
 
 ---
 

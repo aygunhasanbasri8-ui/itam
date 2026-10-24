@@ -1,5 +1,6 @@
 package com.itam.controller;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -17,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
+
 import com.itam.AbstractIntegrationTest;
 
 @AutoConfigureMockMvc
@@ -31,6 +35,9 @@ class AssetDeletionControllerIT extends AbstractIntegrationTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    @Autowired
+    EntityManager entityManager;
+
     @Test
     @DisplayName("silinen asset detayda ve listede artık görünmüyor")
     void silinenAssetGorunmuyor() throws Exception {
@@ -42,6 +49,24 @@ class AssetDeletionControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(get("/api/v1/servers").param("hostname", "silinecek-01"))
                 .andExpect(jsonPath("$.totalElements").value(0));
         mockMvc.perform(delete("/api/v1/assets/{id}", id)).andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("silinen sunucunun hostname'i yeni kayıtta kullanılabiliyor, aktif olanınki kullanılamıyor")
+    void silinenHostnameTekrarKullanilabilir() throws Exception {
+        long eski = sunucuOlustur("yeniden-01.example.local");
+        mockMvc.perform(delete("/api/v1/assets/{id}", eski)).andExpect(status().isNoContent());
+        // Gerçekte silme ayrı bir transaction'da commit edilir; test transaction'ında
+        // UPDATE'in yeni INSERT'ten önce veritabanına inmesini biz sağlıyoruz.
+        entityManager.flush();
+
+        sunucuOlustur("YENIDEN-01.example.local");
+        entityManager.flush();
+
+        // Aktif kayıtla çakışma hâlâ indekse takılıyor. Testte istek dış transaction'a
+        // katıldığı için INSERT flush'ta iner; gerçek istekte bu commit'te 409 olur.
+        sunucuOlustur("yeniden-01.example.local");
+        assertThrows(PersistenceException.class, entityManager::flush);
     }
 
     @Test
