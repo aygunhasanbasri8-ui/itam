@@ -6,10 +6,12 @@ import { BulkStatusBar } from '../../components/BulkStatusBar'
 import { OwnerFilter } from '../../components/OwnerFilter'
 import { Pagination } from '../../components/Pagination'
 import { useSelection } from '../../hooks/useSelection'
-import { ASSET_TYPE_LABELS, ASSET_TYPE_ROUTES } from '../../types/assetType'
+import { useAssetTypes } from '../../hooks/useAssetTypeLabels'
+import { ASSET_TYPE_ROUTES } from '../../types/assetType'
 import { ASSET_STATUS_LABELS } from '../../types/common'
 
 export function AllAssetsPage() {
+  const { labels: assetTypeLabels, active: activeTypes } = useAssetTypes()
   const [q, setQ] = useState('')
   const [assetType, setAssetType] = useState('')
   const [status, setStatus] = useState('')
@@ -55,7 +57,7 @@ export function AllAssetsPage() {
           onChange={(e) => withReset(setAssetType)(e.target.value)}
         >
           <option value="">Tüm tipler</option>
-          {Object.entries(ASSET_TYPE_LABELS).map(([code, label]) => (
+          {activeTypes.map(({ code, label }) => (
             <option key={code} value={code}>
               {label}
             </option>
@@ -120,7 +122,7 @@ export function AllAssetsPage() {
                       {asset.assetName}
                     </Link>
                   </td>
-                  <td className="px-4 py-2 text-slate-600">{ASSET_TYPE_LABELS[asset.assetTypeCode]}</td>
+                  <td className="px-4 py-2 text-slate-600">{assetTypeLabels[asset.assetTypeCode]}</td>
                   <td className="px-4 py-2 text-slate-600">{ASSET_STATUS_LABELS[asset.status]}</td>
                   <td className="px-4 py-2 text-slate-600">{asset.responsibilityOwner?.fullName ?? '-'}</td>
                   <td className="px-4 py-2 text-slate-600">{new Date(asset.createdAt).toLocaleDateString('tr-TR')}</td>

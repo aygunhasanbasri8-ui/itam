@@ -6,7 +6,8 @@ import { searchAssets } from '../api/assetSearch'
 import { useDebouncedValue } from '../hooks/useDebouncedValue'
 import { extractErrorMessage } from '../api/client'
 import { useIsAdmin } from '../auth/useIsAdmin'
-import { ASSET_TYPE_LABELS, ASSET_TYPE_ROUTES, type AssetTypeCode } from '../types/assetType'
+import { useAssetTypes } from '../hooks/useAssetTypeLabels'
+import { ASSET_TYPE_ROUTES, type AssetTypeCode } from '../types/assetType'
 import type { DependencyTreeNode, DependencyType } from '../types/dependency'
 
 const DEPENDENCY_TYPE_LABELS: Record<DependencyType, string> = {
@@ -148,6 +149,7 @@ function EdgeList({
 }
 
 function AddDependencyForm({ assetId, onAdded }: { assetId: number; onAdded: () => void }) {
+  const { labels: assetTypeLabels } = useAssetTypes()
   const [search, setSearch] = useState('')
   const [targetId, setTargetId] = useState('')
   const [direction, setDirection] = useState<Direction>('OUTGOING')
@@ -218,7 +220,7 @@ function AddDependencyForm({ assetId, onAdded }: { assetId: number; onAdded: () 
           <option value="">Varlık seçin ({candidates.length})</option>
           {candidates.map((option) => (
             <option key={option.id} value={option.id}>
-              {option.assetName} — {ASSET_TYPE_LABELS[option.assetTypeCode]}
+              {option.assetName} — {assetTypeLabels[option.assetTypeCode]}
             </option>
           ))}
         </select>

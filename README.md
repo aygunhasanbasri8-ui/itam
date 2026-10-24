@@ -105,9 +105,10 @@ Frontend commands:
 ```bash
 npm run build   # tsc -b && vite build
 npm run lint    # oxlint
+npm test        # Vitest + Testing Library (jsdom)
 ```
 
-GitHub Actions runs `mvn verify` (including the Testcontainers integration tests) and the frontend lint + build on every push to `main` and on pull requests; Dependabot watches Maven, npm and the workflow actions.
+GitHub Actions runs `mvn verify` (including the Testcontainers integration tests) and the frontend lint, tests and build on every push to `main` and on pull requests; Dependabot watches Maven, npm and the workflow actions.
 
 ---
 
