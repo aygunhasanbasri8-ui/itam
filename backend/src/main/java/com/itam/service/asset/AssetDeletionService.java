@@ -7,9 +7,8 @@ public interface AssetDeletionService {
      * eski Excel çıktılarındaki id'ler anlamını korusun diye. Asset'e dokunan
      * bir bağımlılık varsa reddedilir, önce bağımlılıkların kaldırılması gerekir.
      * <p>
-     * Bilinen kısıt: hostname ve seri no tekil indeksleri silinmiş kayıtları da
-     * kapsıyor (is_deleted base_asset'te, indeks alt tablodayken kısmi indeks
-     * kurulamıyor). Aynı hostname ile yeni kayıt açılırsa 409 döner.
+     * Silinen kaydın hostname'i / seri numarası tekil indekslerin dışında kalır
+     * (V10), aynı değerle yeni kayıt açılabilir.
      */
     void softDelete(Long assetId);
 }
