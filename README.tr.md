@@ -19,6 +19,7 @@ Kurum bünyesindeki tüm donanım, yazılım ve iş servisi varlıklarının tek
 - **Toplu durum güncelleme**, arama ve filtreleme (sorumlu, lisans bitiş tarihi vb.).
 - **Excel'e aktarma:** tipe göre dışa aktarım, kolon seçimiyle.
 - **Excel'den içe aktarma (sunucular):** `POST /api/v1/servers/import?dryRun=true|false`, başlıklar dışa aktarımla aynı (dışa aktarılan dosya düzenlenip geri gönderilebilir, üstteki başlık bloğu atlanır). Dosya önce kontrol edilir, satır satır hata raporu döner; tek satır bile hatalıysa hiçbir kayıt yazılmaz. Kişiler sicil kodu, e-posta ya da tam adla verilebilir. Dosyada ya da canlı sunucularda tekrar eden hostname reddedilir. En fazla 5000 satır; `GET /api/v1/servers/import/template` boş şablon döner. Sunucu listesinde **Excel'den içe aktar** (yalnızca admin).
+- **Lisans bitiş bildirimleri:** saatlik bir görev uygulama lisanslarına (`expiryDate`) bakıp bitişe 30, 7 ve 1 gün kala (`itam.notifications.license-expiry.days-before`) birer bildirim gönderir: webhook'a (`ITAM_LICENSE_NOTIFY_WEBHOOK_URL`, Slack/Teams'in doğrudan gösterdiği `text` alanlı JSON) ve/veya e-postayla (`ITAM_LICENSE_NOTIFY_EMAIL_TO` ve lisansın sorumlusu; `spring.mail.*` gerekir). Gönderilenler kaydedilir (`license_expiry_notice`, V11); yeniden başlatma ya da ikinci bir kopya bildirimi tekrarlamaz, uygulamanın kapalı kaldığı saatler sonradan telafi edilir. 5 gün kala eklenen bir lisans geçtiği her eşik için ayrı ayrı değil, tek bildirim alır. Hiç kanal yoksa görev hiçbir şey yapmaz.
 - **Dashboard:** tip, durum ve ortama göre sayılar; süresi dolan ya da dolmak üzere olan lisanslar; son eklenen varlıklar.
 - **Kişi, departman ve kullanıcı yönetimi:** JWT ile giriş, iki rol: `ADMIN` tam yetkili, `USER` yalnızca görüntüleme, filtreleme ve dışa aktarım yapabilir.
 - **Mantıksal silme** ve sorumlu ataması zorunluluğu (bkz. [Veri Modeli Notları](#veri-modeli-notları)).
@@ -69,7 +70,7 @@ cd backend
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-İlk açılışta Flyway `V1`'den `V10`'a kadar tüm migration'ları uygular: 13 çekirdek tablo ve Envers denetim tabloları (`*_aud`) oluşur.
+İlk açılışta Flyway `V1`'den `V11`'e kadar tüm migration'ları uygular: 13 çekirdek tablo ve Envers denetim tabloları (`*_aud`) oluşur.
 
 `dev` profili repodaki varsayılan JWT anahtarını ve seed edilen `admin` / `admin123`
 kullanıcısını olduğu gibi kullanır; bu ikisi yalnızca yerel geliştirme ve testler içindir.

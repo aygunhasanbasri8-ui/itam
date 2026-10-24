@@ -50,6 +50,16 @@ spring:
     encoding: UTF-8
 
 itam:
+  # Lisans bitis bildirimleri: kanal (webhook ya da e-posta) tanimli degilse gorev bos doner.
+  # E-posta icin spring.mail.host/port/username/password da verilmeli.
+  notifications:
+    license-expiry:
+      enabled: ${ITAM_LICENSE_NOTIFY_ENABLED:true}
+      days-before: 30,7,1
+      webhook-url: ${ITAM_LICENSE_NOTIFY_WEBHOOK_URL:}
+      email-to: ${ITAM_LICENSE_NOTIFY_EMAIL_TO:}
+      email-from: ${ITAM_LICENSE_NOTIFY_EMAIL_FROM:itam@localhost}
+      notify-owner: true
   jwt:
     # HS256 en az 32 byte anahtar ister. Asagidaki varsayilan yalnizca dev/test
     # icindir; diger profillerde ProductionCredentialsGuard bununla acilisi durdurur.
