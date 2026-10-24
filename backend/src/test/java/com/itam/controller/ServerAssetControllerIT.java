@@ -145,10 +145,16 @@ class ServerAssetControllerIT extends AbstractIntegrationTest {
         olustur("prod-01.example.local", ServerEnvironment.PROD);
         olustur("dev-01.example.local", ServerEnvironment.DEV);
 
-        mockMvc.perform(get("/api/v1/servers").param("environment", "PROD"))
+        // Başka testlerin commit ettiği PROD sunucular da listede olabilir; hostname'e
+        // değil ortamın kendisine bakıyoruz.
+        mockMvc.perform(get("/api/v1/servers").param("environment", "PROD").param("size", "100"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[*].environment",
+                        org.hamcrest.Matchers.everyItem(org.hamcrest.Matchers.is("PROD"))))
                 .andExpect(jsonPath("$.content[*].hostname",
-                        org.hamcrest.Matchers.everyItem(containsString("prod"))));
+                        org.hamcrest.Matchers.hasItem("prod-01.example.local")))
+                .andExpect(jsonPath("$.content[*].hostname",
+                        org.hamcrest.Matchers.not(org.hamcrest.Matchers.hasItem("dev-01.example.local"))));
     }
 
     private void olustur(String hostname, ServerEnvironment environment) throws Exception {
