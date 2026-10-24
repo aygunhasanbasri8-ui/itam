@@ -19,4 +19,8 @@ public interface ServerAssetRepository
     /** Dashboard özet ekranındaki ortam dağılımı için; her satır [ServerEnvironment, count]. */
     @Query("select s.environment, count(s) from ServerAsset s where s.deleted = false group by s.environment")
     List<Object[]> countByEnvironmentGrouped();
+
+    /** İçe aktarmada çakışma kontrolü; silinmiş kayıtların hostname'i yeniden kullanılabiliyor (V10). */
+    @Query("select lower(s.hostname) from ServerAsset s where s.deleted = false")
+    List<String> findActiveHostnamesLowerCase();
 }
