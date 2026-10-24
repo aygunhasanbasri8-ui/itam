@@ -6,7 +6,7 @@ English | [Türkçe](README.tr.md)
 
 An inventory management system that tracks all of an organization's hardware, software and business-service assets in one place, built with auditability in mind.
 
-**Status:** Backend phases 0-6 are complete (CRUD, authentication, user management, dependency map, audit trail, custom fields, dashboard). The frontend already has list/form screens for the 5 asset types (bulk status update, Excel export, custom fields, dependency and change-history panels), person/department/user management and custom field definitions. Excel import (phase 7) is not implemented yet.
+**Status:** Backend phases 0-6 are complete (CRUD, authentication, user management, dependency map, audit trail, custom fields, dashboard). The frontend already has list/form screens for the 5 asset types (bulk status update, Excel export, custom fields, dependency and change-history panels), person/department/user management and custom field definitions. Excel import (phase 7) is available for servers; the other four asset types are next.
 
 ---
 
@@ -18,6 +18,7 @@ An inventory management system that tracks all of an organization's hardware, so
 - **Custom fields:** fields defined by an admin show up in forms, lists and exports.
 - **Bulk status update**, search and filtering (owner, license expiry, etc.).
 - **Excel export:** per asset type, with column selection.
+- **Excel import (servers):** `POST /api/v1/servers/import?dryRun=true|false` with the same headers as the export (an exported file can be edited and sent back; the title block on top is skipped). The file is checked first and a row-by-row error report comes back; if any row is invalid nothing is written. People can be given by employee code, e-mail or full name. Duplicate hostnames (in the file or among live servers) are rejected. Up to 5000 rows; `GET /api/v1/servers/import/template` returns an empty template. On the server list page: **Excel'den içe aktar** (admin only).
 - **Dashboard:** counts by type, status and environment; licenses that are expired or about to expire; recently added assets.
 - **Person, department and user management:** JWT login with two roles: `ADMIN` has full access, `USER` can only view, filter and export.
 - **Soft delete** and mandatory owner assignment (see [Data Model Notes](#data-model-notes)).
@@ -236,7 +237,7 @@ All sequences are defined with `INCREMENT BY 50`. On the entity side `allocation
                    allocationSize = 50)
 ```
 
-`GenerationType.IDENTITY` is not used: it disables JDBC batch inserts and would slow down the planned Excel import (phase 7).
+`GenerationType.IDENTITY` is not used: it disables JDBC batch inserts and would slow down the Excel import (phase 7).
 
 ### Branches and commits
 

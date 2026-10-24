@@ -33,3 +33,24 @@ export async function listExportColumns(exportPath: string): Promise<ExportColum
   const response = await apiClient.get<ExportColumn[]>(`${exportPath}/columns`)
   return response.data
 }
+
+export interface ImportRowError {
+  row: number
+  column: string | null
+  message: string
+}
+
+export interface ImportReport {
+  dryRun: boolean
+  totalRows: number
+  validRows: number
+  created: number
+  errors: ImportRowError[]
+}
+
+export async function uploadImport(path: string, file: File, dryRun: boolean): Promise<ImportReport> {
+  const form = new FormData()
+  form.append('file', file)
+  const response = await apiClient.post<ImportReport>(path, form, { params: { dryRun } })
+  return response.data
+}

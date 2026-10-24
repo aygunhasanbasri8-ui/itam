@@ -6,7 +6,7 @@
 
 Kurum bünyesindeki tüm donanım, yazılım ve iş servisi varlıklarının tek merkezden yönetildiği, denetim standartlarına uygun envanter yönetim sistemi.
 
-**Durum:** Backend Faz 0-6 tamamlandı (CRUD, kimlik doğrulama, kullanıcı yönetimi, bağımlılık haritası, denetim izi, custom field, dashboard). Frontend'de 5 asset tipinin liste/form ekranları (toplu durum güncelleme, Excel'e aktarma, özel alanlar, bağımlılık ve değişiklik geçmişi panelleri), kişi/departman/kullanıcı yönetimi ve özel alan tanımları hazır. Excel'den içe aktarma (Faz 7) henüz yok.
+**Durum:** Backend Faz 0-6 tamamlandı (CRUD, kimlik doğrulama, kullanıcı yönetimi, bağımlılık haritası, denetim izi, custom field, dashboard). Frontend'de 5 asset tipinin liste/form ekranları (toplu durum güncelleme, Excel'e aktarma, özel alanlar, bağımlılık ve değişiklik geçmişi panelleri), kişi/departman/kullanıcı yönetimi ve özel alan tanımları hazır. Excel'den içe aktarma (Faz 7) sunucular için hazır; diğer dört asset tipi sırada.
 
 ---
 
@@ -18,6 +18,7 @@ Kurum bünyesindeki tüm donanım, yazılım ve iş servisi varlıklarının tek
 - **Özel alanlar:** yöneticinin tanımladığı alanlar form, liste ve dışa aktarımda görünür.
 - **Toplu durum güncelleme**, arama ve filtreleme (sorumlu, lisans bitiş tarihi vb.).
 - **Excel'e aktarma:** tipe göre dışa aktarım, kolon seçimiyle.
+- **Excel'den içe aktarma (sunucular):** `POST /api/v1/servers/import?dryRun=true|false`, başlıklar dışa aktarımla aynı (dışa aktarılan dosya düzenlenip geri gönderilebilir, üstteki başlık bloğu atlanır). Dosya önce kontrol edilir, satır satır hata raporu döner; tek satır bile hatalıysa hiçbir kayıt yazılmaz. Kişiler sicil kodu, e-posta ya da tam adla verilebilir. Dosyada ya da canlı sunucularda tekrar eden hostname reddedilir. En fazla 5000 satır; `GET /api/v1/servers/import/template` boş şablon döner. Sunucu listesinde **Excel'den içe aktar** (yalnızca admin).
 - **Dashboard:** tip, durum ve ortama göre sayılar; süresi dolan ya da dolmak üzere olan lisanslar; son eklenen varlıklar.
 - **Kişi, departman ve kullanıcı yönetimi:** JWT ile giriş, iki rol: `ADMIN` tam yetkili, `USER` yalnızca görüntüleme, filtreleme ve dışa aktarım yapabilir.
 - **Mantıksal silme** ve sorumlu ataması zorunluluğu (bkz. [Veri Modeli Notları](#veri-modeli-notları)).
